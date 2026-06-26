@@ -1,0 +1,102 @@
+<div class="m-profile-drawer d-flex flex-column h-100">
+  <div
+    class="m-profile-drawer__header border-bottom py-2 px-2 d-flex align-items-center justify-content-between flex-shrink-0"
+  >
+    <h5 class="mb-0 fw-semibold">Khác</h5>
+    <button type="button" class="btn-close" aria-label="Đóng" (click)="close()"></button>
+  </div>
+
+  <div class="m-profile-drawer__body flex-grow-1 overflow-auto px-3 py-3">
+    @if (user) {
+      <div class="m-profile-drawer__card text-center">
+        <img
+          [src]="avatarSrc"
+          alt=""
+          width="88"
+          height="88"
+          class="m-profile-drawer__avatar rounded-circle object-fit-cover mx-auto d-block"
+        />
+        <h6 class="fw-semibold mt-3 mb-1">{{ displayName }}</h6>
+        @if (user.userName) {
+          <p class="text-muted small mb-2 mb-0">{{ '@' + user.userName }}</p>
+        }
+      </div>
+
+      <ul class="list-group list-group-flush m-profile-drawer__list mt-3 rounded-3 border overflow-hidden">
+        @if ((user.description || '').trim()) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-notes text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Mô tả</div>
+              <div class="text-break">{{ user.description }}</div>
+            </div>
+          </li>
+        }
+        @if ((user.email || '').trim()) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-mail text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Email</div>
+              <div class="text-break">{{ user.email }}</div>
+            </div>
+          </li>
+        }
+        @if (user.birthday) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-cake text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Ngày sinh</div>
+              <div>{{ formatBirthday(user.birthday) }}</div>
+            </div>
+          </li>
+        }
+        @if (user.gender != null) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-gender-bigender text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Giới tính</div>
+              <div>{{ genderLabel(user.gender) }}</div>
+            </div>
+          </li>
+        }
+        @if ((user.phone || '').trim()) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-phone text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Điện thoại</div>
+              <div>{{ user.phone }}</div>
+            </div>
+          </li>
+        }
+        @if ((user.address || '').trim()) {
+          <li class="list-group-item d-flex align-items-start gap-2 py-3">
+            <i class="ti ti-map-pin text-muted mt-1"></i>
+            <div class="min-w-0">
+              <div class="small text-muted">Địa chỉ</div>
+              <div class="text-break">{{ user.address }}</div>
+            </div>
+          </li>
+        }
+        @if (user.isRootAdmin || user.isEmployee) {
+          <li class="list-group-item py-3 d-flex flex-wrap gap-1">
+            @if (user.isRootAdmin) {
+              <span class="badge bg-primary-subtle text-primary">Quản trị hệ thống</span>
+            }
+            @if (user.isEmployee) {
+              <span class="badge bg-secondary-subtle text-secondary">Nhân viên</span>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted small text-center py-4 mb-0">Không đọc được thông tin tài khoản.</p>
+    }
+  </div>
+
+  <div class="m-profile-drawer__footer border-top p-3 flex-shrink-0">
+    <button type="button" class="btn btn-outline-danger w-100" (click)="logout()">
+      <i class="ti ti-logout me-1"></i>
+      Đăng xuất
+    </button>
+  </div>
+</div>

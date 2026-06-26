@@ -1,0 +1,63 @@
+<div class="error-modal-surface">
+  <button
+    type="button"
+    class="btn-close error-modal-close"
+    aria-label="Đóng"
+    (click)="activeModal.close()"
+  ></button>
+
+  <div class="error-modal-inner">
+    <div class="error-modal-icon" aria-hidden="true">
+      <svg
+        class="error-modal-doc-svg"
+        viewBox="0 0 88 104"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          class="error-modal-doc-shape"
+          d="M12 8C12 5.79086 13.7909 4 16 4H52L76 28V96C76 98.2091 74.2091 100 72 100H16C13.7909 100 12 98.2091 12 96V8Z"
+          fill="currentColor"
+        />
+        <path
+          class="error-modal-doc-fold"
+          d="M52 4V24C52 26.2091 53.7909 28 56 28H76L52 4Z"
+          fill="currentColor"
+        />
+        <path
+          class="error-modal-doc-mark"
+          d="M44 42V68M44 78H44.02"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+
+    <h2 class="error-modal-title">{{ title }}</h2>
+
+    @if (htmlMessage) {
+      <div class="error-modal-message" [innerHTML]="message"></div>
+    } @else {
+      <p class="error-modal-message">{{ message }}</p>
+    }
+
+    <div class="error-modal-actions">
+      <button
+        type="button"
+        class="btn btn-warning error-modal-action"
+        (click)="activeModal.close('support')"
+      >
+        {{ confirmLabel }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-light error-modal-action"
+        (click)="activeModal.close('cancel')"
+      >
+        {{ cancelLabel }}
+      </button>
+    </div>
+  </div>
+</div>

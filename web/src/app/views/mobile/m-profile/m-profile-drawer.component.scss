@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.m-profile-drawer {
+  min-height: 0;
+
+  &__header {
+    background: var(--bs-body-bg, #fff);
+  }
+
+  &__body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__card {
+    padding: 0.5rem 0;
+  }
+
+  &__avatar {
+    border: 3px solid var(--bs-border-color-translucent, #e5e7eb);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  &__list {
+    background: var(--bs-body-bg, #fff);
+  }
+
+  &__footer {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) !important;
+    background: var(--bs-body-bg, #fff);
+  }
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}

@@ -1,0 +1,97 @@
+@if (visible) {
+  <div class="upload-worker" [class.upload-worker--collapsed]="collapsed">
+    <!-- Header -->
+    <div class="upload-worker__header" (click)="toggleCollapse()">
+      <div class="upload-worker__header-left">
+        <i class="ti ti-cloud-upload me-2"></i>
+        @if (activeTasks.length > 0) {
+          <span>Đang tải lên ({{ completedCount }}/{{ totalCount }})</span>
+        } @else {
+          <span>Tải lên hoàn tất</span>
+        }
+      </div>
+      <div class="upload-worker__header-right">
+        @if (!activeTasks.length) {
+          <button
+            class="upload-worker__btn"
+            (click)="dismissAll(); $event.stopPropagation()"
+            title="Đóng"
+          >
+            <i class="ti ti-x"></i>
+          </button>
+        }
+        <button class="upload-worker__btn" title="Thu gọn">
+          <i class="ti" [ngClass]="collapsed ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Task list -->
+    @if (!collapsed) {
+      <div class="upload-worker__body">
+        @for (task of tasks; track trackById($index, task)) {
+          <div class="upload-worker__task">
+            <div class="upload-worker__task-row">
+              <i class="ti {{ statusIcon(task) }} me-2"></i>
+              <span class="upload-worker__task-name" [title]="task.file.name">
+                {{ task.file.name }}
+              </span>
+              <span class="upload-worker__task-size text-muted">
+                {{ task.file.size | fileSize }}
+              </span>
+
+              @if (task.status === 'uploading' || task.status === 'pending') {
+                <button
+                  class="upload-worker__btn upload-worker__btn--cancel"
+                  (click)="cancel(task)"
+                  title="Huỷ"
+                >
+                  <i class="ti ti-x"></i>
+                </button>
+              } @else {
+                <button
+                  class="upload-worker__btn"
+                  (click)="dismiss(task)"
+                  title="Xoá"
+                >
+                  <i class="ti ti-x"></i>
+                </button>
+              }
+            </div>
+
+            @if (task.status === 'uploading') {
+              <div class="upload-worker__progress-row">
+                <div class="progress upload-worker__progress-bar">
+                  <div
+                    class="progress-bar bg-primary"
+                    role="progressbar"
+                    [style.width.%]="task.progress"
+                  ></div>
+                </div>
+                <span class="upload-worker__eta text-muted">
+                  {{ task.progress }}%
+                  @if (formatEta(task.estimatedSecondsLeft); as eta) {
+                    — còn {{ eta }}
+                  }
+                </span>
+              </div>
+            }
+
+            @if (task.status === 'error') {
+              <div class="upload-worker__error-row">
+                <small class="text-danger">{{ task.error }}</small>
+                <button
+                  class="upload-worker__btn upload-worker__btn--retry"
+                  (click)="retry(task)"
+                  title="Tải lại"
+                >
+                  <i class="ti ti-refresh"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

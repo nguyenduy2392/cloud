@@ -1,0 +1,130 @@
+.upload-worker {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 380px;
+  max-height: 60vh;
+  background: var(--greeva-body-bg);
+  border: 1px solid var(--greeva-border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &--collapsed {
+    max-height: none;
+  }
+}
+
+.upload-worker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--greeva-tertiary-bg);
+  border-bottom: 1px solid var(--greeva-border-color);
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.upload-worker__header-left {
+  display: flex;
+  align-items: center;
+}
+
+.upload-worker__header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.upload-worker__btn {
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  cursor: pointer;
+  color: var(--greeva-secondary-color);
+  border-radius: 4px;
+  line-height: 1;
+
+  &:hover {
+    background: var(--greeva-secondary-bg);
+    color: var(--greeva-body-color);
+  }
+
+  &--cancel:hover {
+    color: var(--greeva-danger);
+  }
+}
+
+.upload-worker__body {
+  overflow-y: auto;
+  max-height: calc(60vh - 48px);
+}
+
+.upload-worker__task {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--greeva-border-color-translucent);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.upload-worker__task-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.upload-worker__task-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+
+.upload-worker__task-size {
+  font-size: 0.75rem;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.upload-worker__progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.upload-worker__progress-bar {
+  flex: 1;
+  height: 4px;
+}
+
+.upload-worker__eta {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.upload-worker__error-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.upload-worker__btn--retry {
+  color: var(--greeva-primary);
+  font-size: 0.875rem;
+
+  &:hover {
+    color: var(--greeva-primary);
+    background: var(--greeva-primary-bg-subtle);
+  }
+}

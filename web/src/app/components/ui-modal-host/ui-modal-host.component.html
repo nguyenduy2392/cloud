@@ -1,0 +1,38 @@
+@if (state().visible && state().modal; as m) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    style="background-color: rgba(0, 0, 0, 0.5)"
+    (click)="onBackdropClick($event, m)"
+  >
+    <div
+      class="modal-dialog"
+      [ngClass]="dialogClasses(m)"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h4 class="modal-title mb-0">{{ m.title ?? ' ' }}</h4>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Đóng"
+            (click)="close()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          @if (m.component) {
+            <ng-container
+              *ngComponentOutlet="
+                m.component;
+                ngComponentOutletInputs: componentInputsOf(m)
+              "
+            />
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

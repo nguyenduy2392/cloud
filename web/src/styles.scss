@@ -1,0 +1,359 @@
+/* You can add global styles to this file, and also import other style files */
+@import "../node_modules/leaflet/dist/leaflet.css";
+@import "flatpickr/dist/flatpickr.css";
+@import "nouislider/dist/nouislider.css";
+@import "quill/dist/quill.snow.css";
+@import "quill/dist/quill.bubble.css";
+@import "../public/assets/scss/icons.scss";
+@import "../public/assets/scss/app.scss";
+
+/* ============================
+   DPI-aware zoom (high-DPI screens)
+   Tự động zoom-out khi màn hình có scale > 100%
+   để toàn bộ UI vừa viewport mà chữ vẫn rõ ràng
+   ============================ */
+:root {
+  --app-zoom: 1;
+}
+
+app-root {
+  display: block;
+  zoom: var(--app-zoom);
+  transform-origin: top center;
+  min-height: calc(100vh / var(--app-zoom));
+}
+
+/* Bù zoom cho các class dùng viewport height */
+.min-vh-100 { min-height: calc(100vh / var(--app-zoom)) !important; }
+.vh-100      { height:     calc(100vh / var(--app-zoom)) !important; }
+
+/* Bổ sung: luôn zoom 1 khi layout mobile (khớp html[data-layout='mobile']) */
+html[data-layout='mobile'] {
+  --app-zoom: 1 !important;
+}
+
+
+:root .pagination-boxed .page-link {
+  height: 1.75rem !important;
+  width: 1.75rem !important;
+}
+
+:root .modal-header {
+  h4 {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+  }
+}
+
+:root .nav-link {
+  font-weight: 600 !important;
+}
+
+/* ============================
+   Shared data-table components
+   Dùng chung cho customer-list, user-list, và các list khác
+   ============================ */
+
+/* Wrapper cuộn ngang cho bảng */
+.table-scroll-wrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  min-height: 20rem;
+}
+
+/* Bảng trong wrapper — mặc định 1600px, override bằng --min-table-width */
+.table-scroll-wrapper>.table {
+  width: max(100%, var(--min-table-width, 1600px));
+  min-width: var(--min-table-width, 1600px);
+}
+
+/* Cột dữ liệu (không ghim): tăng độ rộng tối thiểu */
+.table-scroll-wrapper>.table thead th:not(.sticky-col),
+.table-scroll-wrapper>.table tbody td:not(.sticky-col) {
+  min-width: var(--min-col-width, 140px);
+}
+
+/* ============================
+   Sticky columns (ghim cố định khi cuộn ngang)
+   ============================ */
+
+.sticky-col {
+  position: sticky;
+  z-index: 2;
+  background-color: var(--bs-body-bg, #fff) !important;
+  background-clip: padding-box;
+}
+
+thead .sticky-col {
+  z-index: 4;
+  background-color: var(--bs-light-bg-subtle,
+      var(--bs-secondary-bg, var(--bs-tertiary-bg, #f8f9fa))) !important;
+}
+
+/* STT — cột đầu tiên, ghim trái */
+.sticky-col-stt {
+  left: 0;
+  width: 64px;
+  min-width: 64px;
+  max-width: 64px;
+  z-index: 4;
+  box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.12);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Checkbox — cột thứ hai, ghim trái */
+.sticky-col-check {
+  left: 64px;
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  z-index: 4;
+  box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.12);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Actions — ghim phải */
+.sticky-col-actions {
+  right: 0;
+  width: 128px;
+  min-width: 128px;
+  z-index: 3;
+  box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.12);
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+thead .sticky-col-actions {
+  z-index: 5;
+}
+
+thead .sticky-col-stt,
+thead .sticky-col-check {
+  z-index: 6;
+}
+
+/* Hover: sticky cols giữ màu nền */
+.table-hover>tbody>tr:hover>.sticky-col {
+  //   background-color: var(--bs-table-hover-bg, rgba(0, 0, 0, 0.075)) !important;
+}
+
+/* ============================
+   Avatar thumbnail
+   ============================ */
+
+.avatar-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bs-border-color, #dee2e6);
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+  color: var(--bs-primary, #0d6efd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 2px solid var(--bs-border-color, #dee2e6);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ============================
+   Data table shared utilities
+   ============================ */
+
+.table> :not(caption)>*>* {
+  color: #212529 !important;
+}
+
+/* ============================
+   Modal overrides
+   ============================ */
+
+.modal-header {
+  padding: 1rem 1.5rem !important;
+}
+
+.page-container {
+  max-width: 98% !important;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem !important;
+}
+
+/* Modal lỗi — căn trên cùng viewport; nội dung là thẻ bo góc trong component */
+.modal.error-modal-top {
+  margin-top: 0;
+
+  .modal-dialog {
+    max-width: 20rem;
+    margin: 0 auto;
+  }
+
+  .modal-content {
+    border: none;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    background: transparent;
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Modal căn trên — dùng cho các modal muốn hiển thị ở vị trí top */
+.modal.modal-top {
+  align-items: flex-start !important;
+
+  .modal-dialog {
+    margin: 1rem auto;
+  }
+}
+
+input.font-monospace::placeholder {
+  font-family: var(--bs-font-monospace), 'Courier New', Courier, monospace !important;
+  opacity: 0.6;
+}
+
+/* ============================
+   Pagination adjustments
+   ============================ */
+
+ul.pagination {
+  li {
+    &:first-child {
+      margin-right: 1rem;
+    }
+
+    &:last-child {
+      margin-left: 1rem;
+    }
+  }
+}
+
+:root .modal-max {
+  min-width: 1600px !important;
+}
+
+.modal.modal-max {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modal.modal-max .modal-dialog {
+  max-width: 1600px !important;
+  min-width: 1600px !important;
+  width: 95vw !important;
+  margin: 1.75rem auto !important;
+}
+
+.modal.modal-max.modal.show {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* ============================
+   Mobile — CSS riêng (Mini CRM)
+   - `MobileLayout` set `data-layout="mobile"` trên <html>.
+   - Wrapper chính thường có class `.mobile-shell` (trong `mobile-layout.html`).
+   Viết thêm rule bên trong khối `html[data-layout='mobile']` { ... } để chỉ áp dụng
+   khi đang giao diện mobile; hoặc dùng selector `.mobile-shell ...` nếu chỉ cần bọc layout.
+   ============================ */
+
+html[data-layout='mobile'] {
+  /* Topbar mobile (cùng class `.app-topbar` với desktop — cần giới hạn theo data-layout) */
+  .app-topbar {
+    margin: 0 !important;
+  }
+
+  .page-content{
+    margin-left: 0 !important;
+  }
+  .container, .container-fluid, .page-container, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .card-body{
+    padding: 0rem !important;
+  }
+}
+
+/* ============================
+   File preview modal
+   ============================ */
+/* ============================
+   Topbar search
+   ============================ */
+.topbar-search {
+  flex: 1;
+  max-width: 420px;
+  min-width: 180px;
+}
+.topbar-search__input {
+  padding-left: 2.25rem !important;
+  padding-right: 2rem !important;
+  border-radius: 20px;
+  background: var(--greeva-tertiary-bg);
+  border: 1px solid var(--greeva-border-color);
+  font-size: 0.8125rem;
+  height: 34px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  &::placeholder {
+    color: var(--greeva-secondary-color);
+    font-size: 0.8125rem;
+  }
+  &:focus {
+    background: var(--greeva-secondary-bg);
+    border-color: var(--greeva-primary);
+    box-shadow: 0 0 0 2px rgba(var(--greeva-primary-rgb), 0.15);
+  }
+}
+.topbar-search__icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--greeva-secondary-color);
+  font-size: 0.9375rem;
+  pointer-events: none;
+}
+.topbar-search__clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--greeva-secondary-color);
+  padding: 2px 4px;
+  line-height: 1;
+  font-size: 0.875rem;
+  border-radius: 50%;
+  &:hover {
+    color: var(--greeva-body-color);
+    background: var(--greeva-tertiary-bg);
+  }
+}
+
+.file-preview-fullscreen .modal-dialog {
+  max-width: 95vw;
+  margin: 2.5vh auto;
+}
+.file-preview-fullscreen .modal-content {
+  height: 90vh;
+  overflow: hidden;
+  border: none;
+  border-radius: 8px;
+}

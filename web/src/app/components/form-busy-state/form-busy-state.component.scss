@@ -1,0 +1,92 @@
+.form-busy-state {
+  --fbs-green: var(--bs-success, #22c55e);
+  --fbs-green-soft: color-mix(in srgb, var(--fbs-green) 12%, transparent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  padding: 2rem 1.25rem 2.25rem;
+  text-align: center;
+}
+
+.form-busy-state__graphic {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 1.35rem;
+}
+
+.form-busy-state__ring-svg {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+
+.form-busy-state__ring-svg--spin {
+  animation: form-busy-state-spin 1.35s linear infinite;
+}
+
+.form-busy-state__ring-track {
+  stroke: var(--bs-border-color, #e9ecef);
+}
+
+.form-busy-state__ring-progress {
+  stroke: var(--fbs-green);
+  stroke-dasharray: 66 198;
+  stroke-dashoffset: 0;
+}
+
+.form-busy-state__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--fbs-green) 88%, white) 0%,
+    var(--fbs-green) 100%
+  );
+  box-shadow:
+    0 4px 14px var(--fbs-green-soft),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-busy-state__core-icon {
+  font-size: 1.35rem;
+  color: #fff;
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.form-busy-state__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--bs-heading-color, var(--bs-emphasis-color, #212529));
+  letter-spacing: -0.01em;
+}
+
+.form-busy-state__sub {
+  margin: 0;
+  max-width: 280px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bs-secondary-color, #6c757d);
+}
+
+.form-busy-state__title:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes form-busy-state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

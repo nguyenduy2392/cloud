@@ -1,0 +1,83 @@
+<div class="m-auth-login">
+  <div class="m-auth-login__inner">
+    <div class="m-auth-login__brand" style="margin-bottom: 4rem; margin-top: 4rem;">
+      <img
+        class="m-auth-login__logo"
+        src="assets/images/logo-dark.png"
+        alt="Z.CRM"
+        width="320"
+        height="80"
+        loading="eager"
+      />
+    </div>
+    <header class="m-auth-login__header">
+      <h1 class="m-auth-login__title">Đăng nhập</h1>
+      <p class="m-auth-login__subtitle">Chào mừng bạn quay lại ứng dụng</p>
+    </header>
+
+    @if (errorMessage) {
+      <div class="m-auth-login__alert" role="alert">{{ errorMessage }}</div>
+    }
+
+    <form [formGroup]="signInForm" (ngSubmit)="login()" class="m-auth-login__form">
+      <div class="m-auth-login__field">
+        <label class="m-auth-login__label" for="m-auth-identity">Định danh đơn vị</label>
+        <input
+          id="m-auth-identity"
+          formControlName="identity"
+          type="text"
+          class="m-auth-login__input"
+          placeholder="Nhập định danh đơn vị"
+          autocomplete="organization"
+          [ngClass]="{ 'is-invalid': submitted && formValues['identity'].errors }"
+        />
+      </div>
+
+      <div class="m-auth-login__field">
+        <label class="m-auth-login__label" for="m-auth-email">Email hoặc tên đăng nhập</label>
+        <input
+          id="m-auth-email"
+          formControlName="userName"
+          type="text"
+          class="m-auth-login__input"
+          placeholder="hello@example.com"
+          autocomplete="username"
+          [ngClass]="{ 'is-invalid': submitted && formValues['userName'].errors }"
+        />
+      </div>
+
+      <div class="m-auth-login__field">
+        <div class="m-auth-login__label-row">
+          <label class="m-auth-login__label mb-0" for="m-auth-password">Mật khẩu</label>
+          <a routerLink="/auth/recover-password" class="m-auth-login__link-inline">Quên mật khẩu?</a>
+        </div>
+        <div class="m-auth-login__password-wrap">
+          <input
+            id="m-auth-password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="m-auth-login__input m-auth-login__input--with-toggle"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            [ngClass]="{ 'is-invalid': submitted && formValues['password'].errors }"
+          />
+          <button
+            type="button"
+            class="m-auth-login__toggle-visibility"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          >
+            <i class="ti" [class.ti-eye]="!showPassword" [class.ti-eye-off]="showPassword"></i>
+          </button>
+        </div>
+      </div>
+
+      <label class="m-auth-login__remember">
+        <input type="checkbox" formControlName="rememberMe" class="m-auth-login__checkbox" />
+        <span>Duy trì đăng nhập</span>
+      </label>
+
+      <button type="submit" class="m-auth-login__btn-primary">Đăng nhập</button>
+    </form>
+  </div>
+</div>

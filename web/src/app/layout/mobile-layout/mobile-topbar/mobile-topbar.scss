@@ -1,0 +1,60 @@
+/* Chỉ dùng trong mobile layout — bổ sung nếu cần, global đã có html[data-layout='mobile'] */
+:host .app-topbar {
+  padding-left: 0 !important;
+}
+
+.mobile-topbar__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.25rem;
+}
+
+.mobile-topbar__cell--start {
+  justify-self: start;
+}
+
+.mobile-topbar__cell--title {
+  justify-self: center;
+  text-align: center;
+  max-width: 100%;
+}
+
+.mobile-topbar__cell--end {
+  justify-self: end;
+}
+
+.mobile-topbar__back-link {
+  line-height: 1.2;
+  --bs-btn-color: var(--bs-secondary-color);
+  --bs-btn-hover-color: var(--bs-emphasis-color);
+}
+
+.mobile-topbar__back-icon {
+  font-size: 1.125rem;
+  margin-inline-end: 0.0625rem;
+}
+
+.mobile-topbar__back-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.mobile-topbar__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--bs-emphasis-color);
+  line-height: 1.25;
+}
+
+.mobile-topbar__subtitle {
+  font-size: 0.75rem;
+  color: var(--bs-secondary-color);
+  line-height: 1.2;
+  margin-top: 0.125rem !important;
+}
+
+:root .nav-user{
+    border: 0 !important;
+}

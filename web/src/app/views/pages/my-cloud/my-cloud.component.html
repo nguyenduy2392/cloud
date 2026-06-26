@@ -1,0 +1,278 @@
+<div class="container-fluid">
+  <!-- Toolbar -->
+  <div class="my-cloud-toolbar d-flex align-items-center gap-2 mb-3">
+    <nav aria-label="breadcrumb" class="me-auto">
+      <ol class="breadcrumb mb-0 fw-semibold">
+        <li class="breadcrumb-item" [class.active]="isRoot">
+          @if (mode === 'shared' && isRoot) {
+            <i class="ti ti-share me-1"></i>Chia sẻ với tôi
+          } @else if (mode === 'shared') {
+            <a routerLink="/shared-with-me"><i class="ti ti-share me-1"></i>Chia sẻ với tôi</a>
+          } @else if (isRoot) {
+            <i class="ti ti-cloud me-1"></i>Cloud của tôi
+          } @else {
+            <a routerLink="/my-cloud"><i class="ti ti-cloud me-1"></i>Cloud của tôi</a>
+          }
+        </li>
+        @for (crumb of breadcrumbs; track crumb.id; let last = $last) {
+          <li class="breadcrumb-item" [class.active]="last">
+            @if (last) {
+              {{ crumb.name }}
+            } @else {
+              <a href="javascript:void(0)" (click)="navigateBreadcrumb(crumb)">{{ crumb.name }}</a>
+            }
+          </li>
+        }
+      </ol>
+    </nav>
+    @if (mode !== 'shared') {
+      <button type="button" class="btn btn-primary btn-sm" (click)="fileInput.click()">
+        <i class="ti ti-cloud-upload me-1"></i>Tải lên
+      </button>
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="openCreateFolder()">
+        <i class="ti ti-folder-plus me-1"></i>Thư mục mới
+      </button>
+    }
+    <input
+      #fileInput
+      type="file"
+      class="d-none"
+      multiple
+      (change)="onFileSelected($event)"
+    />
+    <button
+      type="button"
+      class="btn btn-light btn-sm"
+      (click)="loadFirst()"
+      title="Làm mới"
+    >
+      <i class="ti ti-refresh"></i>
+    </button>
+    <div class="btn-group btn-group-sm view-toggle" role="group">
+      <button
+        type="button"
+        class="btn btn-light"
+        [class.active]="viewMode === 'list'"
+        (click)="setViewMode('list')"
+        title="Danh sách"
+      >
+        <i class="ti ti-list"></i>
+      </button>
+      <button
+        type="button"
+        class="btn btn-light"
+        [class.active]="viewMode === 'grid'"
+        (click)="setViewMode('grid')"
+        title="Lưới"
+      >
+        <i class="ti ti-layout-grid"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card">
+    <div class="card-body p-0 position-relative">
+      @if (loading) {
+        <app-table-loading-overlay title="Đang tải..." subtitle=""></app-table-loading-overlay>
+      }
+
+      @if (!loading && isEmpty) {
+        @if (mode === 'shared') {
+          <app-empty-state
+            icon="ti ti-share"
+            title="Chưa có dữ liệu"
+            description="Chưa có tệp hoặc thư mục nào được chia sẻ với bạn."
+          ></app-empty-state>
+        } @else {
+          <app-empty-state
+            icon="ti ti-folder-open"
+            title="Chưa có dữ liệu"
+            description="Chưa có tệp hoặc thư mục nào. Bạn có thể tải lên tệp hoặc tạo thư mục mới."
+            buttonLabel="Tải lên tệp"
+            (buttonClick)="fileInput.click()"
+          ></app-empty-state>
+        }
+      }
+
+      @if (!isEmpty) {
+        <!-- List view -->
+        @if (viewMode === 'list') {
+          <div>
+            <table class="table table-hover table-nowrap mb-0">
+              <thead class="table-light my-cloud-thead">
+                <tr>
+                  <th style="width: 40px"></th>
+                  <th>Tên</th>
+                  <th style="width: 100px">Kích thước</th>
+                  <th style="width: 160px">Ngày tạo</th>
+                  <th style="width: 60px" class="text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (folder of folders; track folder.id) {
+                  <tr class="folder-row">
+                    <td class="text-center" (click)="openFolder(folder)">
+                      <i class="ti ti-folder-filled folder-icon"></i>
+                    </td>
+                    <td (click)="openFolder(folder)">
+                      <span class="fw-medium">{{ folder.name }}</span>
+                    </td>
+                    <td (click)="openFolder(folder)">&mdash;</td>
+                    <td (click)="openFolder(folder)">{{ folder.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="text-center">
+                      <div ngbDropdown container="body">
+                        <button class="btn btn-sm btn-light btn-icon" ngbDropdownToggle type="button">
+                          <i class="ti ti-dots-vertical"></i>
+                        </button>
+                        <div ngbDropdownMenu>
+                          <button ngbDropdownItem (click)="shareFolder(folder)">
+                            <i class="ti ti-share me-2"></i>Chia sẻ
+                          </button>
+                          <button ngbDropdownItem (click)="renameFolder(folder)">
+                            <i class="ti ti-pencil me-2"></i>Đổi tên
+                          </button>
+                          <div class="dropdown-divider"></div>
+                          <button ngbDropdownItem class="text-danger" (click)="deleteFolder(folder)">
+                            <i class="ti ti-trash me-2"></i>Xóa
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @for (file of files; track file.id) {
+                  <tr class="folder-row" (click)="openFile(file)">
+                    <td class="text-center">
+                      <i class="ti file-icon {{ getFileIcon(file.name).icon }} {{ getFileIcon(file.name).colorClass }}"></i>
+                    </td>
+                    <td>
+                      <span class="fw-medium">{{ file.name }}</span>
+                    </td>
+                    <td>{{ file.sizeInBytes | fileSize }}</td>
+                    <td>{{ file.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="text-center" (click)="$event.stopPropagation()">
+                      <div ngbDropdown container="body">
+                        <button class="btn btn-sm btn-light btn-icon" ngbDropdownToggle type="button">
+                          <i class="ti ti-dots-vertical"></i>
+                        </button>
+                        <div ngbDropdownMenu>
+                          <button ngbDropdownItem (click)="downloadFile(file)">
+                            <i class="ti ti-download me-2"></i>Tải xuống
+                          </button>
+                          <button ngbDropdownItem (click)="shareFile(file)">
+                            <i class="ti ti-share me-2"></i>Chia sẻ
+                          </button>
+                          <button ngbDropdownItem (click)="renameFile(file)">
+                            <i class="ti ti-pencil me-2"></i>Đổi tên
+                          </button>
+                          <div class="dropdown-divider"></div>
+                          <button ngbDropdownItem class="text-danger" (click)="deleteFile(file)">
+                            <i class="ti ti-trash me-2"></i>Xóa
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- Grid view -->
+        @if (viewMode === 'grid') {
+          <div class="my-cloud-grid">
+            @for (folder of folders; track folder.id) {
+              <div class="grid-item" (click)="openFolder(folder)">
+                <div class="grid-item__actions" (click)="$event.stopPropagation()">
+                  <div ngbDropdown container="body">
+                    <button class="btn btn-sm btn-light btn-icon" ngbDropdownToggle type="button">
+                      <i class="ti ti-dots"></i>
+                    </button>
+                    <div ngbDropdownMenu>
+                      <button ngbDropdownItem (click)="shareFolder(folder)">
+                        <i class="ti ti-share me-2"></i>Chia sẻ
+                      </button>
+                      <button ngbDropdownItem (click)="renameFolder(folder)">
+                        <i class="ti ti-pencil me-2"></i>Đổi tên
+                      </button>
+                      <div class="dropdown-divider"></div>
+                      <button ngbDropdownItem class="text-danger" (click)="deleteFolder(folder)">
+                        <i class="ti ti-trash me-2"></i>Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid-item__icon-wrap">
+                  <i class="ti ti-folder-filled grid-item__icon" style="color: #f0ad4e;"></i>
+                </div>
+                <div class="grid-item__body">
+                  <div class="grid-item__name" [title]="folder.name">{{ folder.name }}</div>
+                </div>
+              </div>
+            }
+            @for (file of files; track file.id) {
+              <div class="grid-item" (click)="openFile(file)">
+                <div class="grid-item__actions" (click)="$event.stopPropagation()">
+                  <div ngbDropdown container="body">
+                    <button class="btn btn-sm btn-light btn-icon" ngbDropdownToggle type="button">
+                      <i class="ti ti-dots"></i>
+                    </button>
+                    <div ngbDropdownMenu>
+                      <button ngbDropdownItem (click)="downloadFile(file)">
+                        <i class="ti ti-download me-2"></i>Tải xuống
+                      </button>
+                      <button ngbDropdownItem (click)="shareFile(file)">
+                        <i class="ti ti-share me-2"></i>Chia sẻ
+                      </button>
+                      <button ngbDropdownItem (click)="renameFile(file)">
+                        <i class="ti ti-pencil me-2"></i>Đổi tên
+                      </button>
+                      <div class="dropdown-divider"></div>
+                      <button ngbDropdownItem class="text-danger" (click)="deleteFile(file)">
+                        <i class="ti ti-trash me-2"></i>Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                @if (isImage(file.name)) {
+                  <div class="grid-item__preview">
+                    <img [src]="previewUrl(file.id)" [alt]="file.name" loading="lazy" />
+                  </div>
+                } @else if (isVideo(file.name)) {
+                  <div class="grid-item__preview">
+                    <video [src]="previewUrl(file.id)" muted preload="metadata"></video>
+                  </div>
+                } @else {
+                  <div class="grid-item__icon-wrap">
+                    <i class="ti grid-item__icon {{ getFileIcon(file.name).icon }} {{ getFileIcon(file.name).colorClass }}"></i>
+                  </div>
+                }
+                <div class="grid-item__body">
+                  <div class="grid-item__name" [title]="file.name">{{ file.name }}</div>
+                  <small class="grid-item__meta text-muted">{{ file.sizeInBytes | fileSize }}</small>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (loadingMore) {
+          <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Đang tải thêm...</span>
+            </div>
+            <span class="ms-2 text-muted small">Đang tải thêm...</span>
+          </div>
+        }
+
+        @if (!hasMore && !loading && !loadingMore) {
+          <div class="text-center py-2">
+            <small class="text-muted">Đã hiển thị tất cả {{ folders.length + files.length }} mục</small>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

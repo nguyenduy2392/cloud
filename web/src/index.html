@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Cloud - Happy Ecotech</title>
+   <base href="/"/>
+     <!-- <base href="/cloud/" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#3b5de7"/>
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <script src="env.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbvyBxmMbFhrzP9Z8moyYr6dCr-pzjhBE"></script>
+    <style>
+      #splash-screen {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        background: white;
+        display: flex;
+        height: 100%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: all 15s linear;
+        overflow: hidden;
+      }
+
+      #splash-screen.remove {
+        animation: fadeout 0.7s forwards;
+        z-index: 0;
+      }
+
+      @keyframes fadeout {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+    </style>
+    <link rel="manifest" href="manifest.webmanifest"/>
+</head>
+  <body>
+    <app-root></app-root>
+    <div id="splash-screen">
+      <img alt="Logo" class="light" src="./assets/images/logo-dark.png" style="height: 5%"/>
+    </div>
+    <script>
+      (function () {
+        // Xóa splash screen
+        var splashScreen = document.querySelector('#splash-screen');
+        if (splashScreen) {
+          splashScreen.classList.add('remove');
+        }
+
+        // ── DPI-aware zoom ──────────────────────────────────────────────────
+        // Đặt thành false để tắt hoàn toàn tính năng zoom tự động theo DPI.
+        var DPI_ZOOM_ENABLED = false;
+
+        if (DPI_ZOOM_ENABLED) {
+          var uaMobile =
+            /android|iphone|ipad|ipod|webos|blackberry|iemobile|opera mini|mobile/i.test(
+              navigator.userAgent
+            );
+          var isIpad =
+            navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+          var coarseSmall =
+            window.matchMedia('(pointer: coarse)').matches &&
+            window.matchMedia('(max-width: 1024px)').matches;
+          var skipDpiZoom = uaMobile || isIpad || coarseSmall;
+
+          if (!skipDpiZoom) {
+            var dpr = window.devicePixelRatio || 1;
+            var zoomMap = {
+              1.25: 0.80,
+              1.50: 0.67,
+              1.75: 0.57,
+              2.0: 0.5,
+            };
+
+            var zoom = 1;
+            if (dpr >= 2.0) {
+              zoom = zoomMap[2.0];
+            } else if (dpr >= 1.75) {
+              zoom = zoomMap[1.75];
+            } else if (dpr >= 1.5) {
+              zoom = zoomMap[1.5];
+            } else if (dpr >= 1.25) {
+              zoom = zoomMap[1.25];
+            }
+
+            if (zoom < 1) {
+              document.documentElement.style.setProperty('--app-zoom', zoom);
+            }
+          }
+        }
+        // ───────────────────────────────────────────────────────────────────
+
+      })();
+    </script>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<div
+  class="form-busy-state"
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+>
+  <div class="form-busy-state__graphic" aria-hidden="true">
+    <svg
+      class="form-busy-state__ring-svg"
+      [class.form-busy-state__ring-svg--spin]="spinRing"
+      viewBox="0 0 100 100"
+      width="96"
+      height="96"
+    >
+      <circle
+        class="form-busy-state__ring-track"
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        stroke-width="5"
+      />
+      <circle
+        class="form-busy-state__ring-progress"
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        stroke-width="5"
+        stroke-linecap="round"
+        transform="rotate(-90 50 50)"
+      />
+    </svg>
+    <div class="form-busy-state__core">
+      <i [class]="iconClass + ' form-busy-state__core-icon'"></i>
+    </div>
+  </div>
+  <h5 class="form-busy-state__title">{{ title }}</h5>
+  @if (subtitle) {
+    <p class="form-busy-state__sub">{{ subtitle }}</p>
+  }
+</div>

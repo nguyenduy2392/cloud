@@ -1,0 +1,71 @@
+<p class="text-muted mb-4">
+  Nhập tên đăng nhập và mật khẩu để truy cập hệ thống.
+</p>
+
+<p *ngIf="errorMessage.length > 0" class="fs-14 text-danger">
+  {{ errorMessage }}
+</p>
+
+<form [formGroup]="signInForm" (ngSubmit)="login()" class="text-start mb-3">
+  <div class="mb-3">
+    <label class="form-label" for="example-identity">Định danh đơn vị</label>
+    <input
+      formControlName="identity"
+      type="text"
+      id="example-identity"
+      class="form-control"
+      placeholder="Nhập định danh đơn vị"
+      autocomplete="organization"
+      [ngClass]="{ 'is-invalid': submitted && formValues['identity'].errors }"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="example-username">Tên đăng nhập</label>
+    <input
+      formControlName="userName"
+      type="text"
+      id="example-username"
+      class="form-control"
+      placeholder="Nhập tên đăng nhập"
+      autocomplete="username"
+      [ngClass]="{ 'is-invalid': submitted && formValues['userName'].errors }"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="example-password">Mật khẩu</label>
+    <input
+      type="password"
+      formControlName="password"
+      id="example-password"
+      class="form-control"
+      placeholder="Nhập mật khẩu"
+      [ngClass]="{ 'is-invalid': submitted && formValues['password'].errors }"
+    />
+  </div>
+
+  <div class="d-flex justify-content-between mb-3">
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="checkbox-signin" />
+      <label class="form-check-label" for="checkbox-signin">Ghi nhớ thông tin đăng nhập</label>
+    </div>
+
+    <a
+      routerLink="/auth/recover-password"
+      class="text-muted border-bottom border-dashed"
+      >Quên mật khẩu?</a
+    >
+  </div>
+
+  <div class="d-grid">
+    <button class="btn btn-primary" type="submit">Đăng nhập</button>
+  </div>
+</form>
+
+<p class="text-muted fs-14 mb-4">
+  Không có tài khoản?
+  <a routerLink="/auth/register" class="fw-semibold text-danger ms-1"
+    >Đăng ký tài khoản!</a
+  >
+</p>

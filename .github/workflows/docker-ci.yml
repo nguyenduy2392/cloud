@@ -1,0 +1,65 @@
+name: Build and Deploy HRM
+
+on:
+  push:
+    branches: [ "dev" ] # chỉnh lại branch nếu bạn dùng tên khác
+
+jobs:
+  # JOB 1: Build & Push Backend (API)
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api            # thư mục API của HRM
+          file: ./api/Dockerfile    # Dockerfile API
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mini-crm-service-dev:latest
+
+  # JOB 2: Build & Push Frontend (Web)
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web            # thư mục Angular HRM
+          file: ./web/Dockerfile    # Dockerfile Web
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mini-crm-ui-dev:latest
+
+  # JOB 3: Deploy lên server, pull image mới và reload container
+  deploy:
+    needs: [build-backend, build-frontend] # chạy sau khi build xong cả 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH and reload containers
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/eco
+            docker-compose -f docker-compose.prod.yml pull mini-crm-ui-dev mini-crm-service-dev # kéo image mới nhất
+            docker-compose -f docker-compose.prod.yml up -d mini-crm-ui-dev mini-crm-service-dev # restart/update container
+            docker-compose -f docker-compose.prod.yml exec gateway nginx -s reload # reload nginx để áp dụng thay đổi nếu cần

@@ -1,0 +1,10 @@
+@if (deviceUi.useMobileShell()) {
+  <mobile-layout />
+} @else {
+  @if (isVerticalLayoutRequested()) {
+    <app-main-layout />
+  }
+  @if (isHorizontalLayoutRequested()) {
+    <horizontal-layout />
+  }
+}

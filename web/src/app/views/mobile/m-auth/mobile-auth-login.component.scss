@@ -1,0 +1,266 @@
+$auth-primary: #3355ff;
+$auth-border: #d1d5db;
+$auth-muted: #6b7280;
+$auth-subtle: #9ca3af;
+
+.m-auth-login {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1.75rem 1.25rem 2rem;
+  background: var(--bs-body-bg, #fff);
+  box-sizing: border-box;
+
+  &__inner {
+    max-width: 26rem;
+    margin: 0 auto;
+  }
+
+  &__brand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  &__logo {
+    display: block;
+    width: min(18rem, 78vw);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--bs-emphasis-color, #111827);
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: $auth-muted;
+    line-height: 1.45;
+  }
+
+  &__alert {
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.5rem;
+    background: rgba(220, 53, 69, 0.08);
+    color: #b02a37;
+    font-size: 0.875rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  &__link-inline {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: $auth-primary;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--bs-body-color, #111827);
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid $auth-border;
+    border-radius: 0.5rem;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: $auth-subtle;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $auth-primary;
+      box-shadow: 0 0 0 3px rgba(51, 85, 255, 0.2);
+    }
+
+    &.is-invalid {
+      border-color: #dc3545;
+    }
+
+    &--with-toggle {
+      padding-right: 2.75rem;
+    }
+  }
+
+  &__password-wrap {
+    position: relative;
+  }
+
+  &__toggle-visibility {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    padding: 0.4rem 0.5rem;
+    color: $auth-muted;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 0.35rem;
+
+    &:hover {
+      color: #374151;
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .ti {
+      font-size: 1.15rem;
+    }
+  }
+
+  &__remember {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    color: $auth-muted;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__checkbox {
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 0.2rem;
+    accent-color: $auth-primary;
+    cursor: pointer;
+  }
+
+  &__btn-primary {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.85rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: $auth-primary;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.05s ease;
+
+    &:hover {
+      background: #2944d4;
+    }
+
+    &:active {
+      transform: scale(0.99);
+    }
+  }
+
+  &__divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.75rem 0 1.25rem;
+    color: $auth-subtle;
+    font-size: 0.8125rem;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: $auth-border;
+    }
+
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  &__btn-google {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #4b5563;
+    background: #f3f4f6;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
+
+  &__google-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    margin: 2rem 0 0;
+    text-align: center;
+  }
+
+  &__link-account {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $auth-primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

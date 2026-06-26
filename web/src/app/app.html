@@ -1,0 +1,12 @@
+<ng-progress
+  #progressBar
+  [trickleSpeed]="10"
+  [speed]="10"
+  [spinner]="false"
+  color="#465dff"
+></ng-progress>
+
+<router-outlet />
+<app-upload-worker />
+<app-ui-modal-host />
+<app-toast-notify />

@@ -1,0 +1,70 @@
+<div class="container-fluid">
+  <div class="row mt-3">
+    <div class="col-12">
+      <h4 class="fw-semibold mb-1">Cloud - Happy Ecotech</h4>
+      <p class="text-muted mb-4">Chào mừng bạn đến với hệ thống quản lý tài liệu.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Storage Usage Card -->
+    <div class="col-lg-6 col-xl-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+              <i class="ti ti-cloud fs-4 text-primary"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">Dung lượng lưu trữ</h6>
+              <small class="text-muted">Dung lượng đã sử dụng</small>
+            </div>
+          </div>
+
+          @if (storageLoading) {
+            <div class="placeholder-glow">
+              <span class="placeholder col-12" style="height: 8px; border-radius: 4px;"></span>
+              <span class="placeholder col-4 mt-2" style="height: 14px;"></span>
+            </div>
+          } @else if (storage) {
+            <div class="progress mb-2" style="height: 8px;">
+              <div
+                class="progress-bar {{ progressBarClass }}"
+                role="progressbar"
+                [style.width.%]="usagePercent"
+              ></div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <small class="text-muted">{{ usageLabel }}</small>
+              <small class="text-muted">{{ usagePercent | number:'1.0-1' }}%</small>
+            </div>
+          } @else {
+            <p class="text-muted small mb-0">Không tải được thông tin dung lượng.</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Card -->
+    <div class="col-lg-6 col-xl-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="rounded-circle bg-success bg-opacity-10 p-2 me-3">
+              <i class="ti ti-bolt fs-4 text-success"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">Thao tác nhanh</h6>
+              <small class="text-muted">Truy cập nhanh các chức năng</small>
+            </div>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <a routerLink="/" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-home me-1"></i>Home
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="modal-header border-bottom">
+  <h5 class="modal-title">{{ title }}</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Đóng"
+    (click)="activeModal.dismiss()"
+  ></button>
+</div>
+<div class="modal-body">
+  <p class="mb-0 text-body" [innerHTML]="message"></p>
+  @if (warningMessage) {
+    <div class="alert alert-warning py-2 mt-3 mb-0">{{ warningMessage }}</div>
+  }
+</div>
+<div class="modal-footer border-top">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">
+    {{ cancelLabel }}
+  </button>
+  <button
+    type="button"
+    class="btn"
+    [ngClass]="danger ? 'btn-danger' : 'btn-primary'"
+    (click)="activeModal.close(true)"
+  >
+    {{ confirmLabel }}
+  </button>
+</div>

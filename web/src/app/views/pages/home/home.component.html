@@ -1,0 +1,46 @@
+<div class="container-fluid py-3">
+  @for (section of sections; track section.key) {
+    <div class="home-section">
+      <div class="home-section__header" (click)="toggle(section)">
+        <i
+          class="ti ti-chevron-right home-section__arrow"
+          [class.home-section__arrow--open]="!section.collapsed"
+        ></i>
+        <i class="{{ section.icon }} me-2"></i>
+        {{ section.title }}
+        @if (!section.loading) {
+          <span class="home-section__count text-muted">({{ itemCount(section) }})</span>
+        }
+      </div>
+
+      <div [ngbCollapse]="section.collapsed">
+        @if (section.loading) {
+          <div class="px-4 py-3">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
+            <span class="ms-2 text-muted small">Đang tải...</span>
+          </div>
+        } @else if (itemCount(section) === 0) {
+          <div class="px-4 py-3 text-muted small">Không có dữ liệu.</div>
+        } @else {
+          <div class="home-grid">
+            @for (folder of section.folders; track folder.id) {
+              <div
+                class="home-item"
+                (click)="openFolder(folder, section.key === 'shared-folders')"
+              >
+                <i class="ti ti-folder-filled home-item__icon folder-icon"></i>
+                <span class="home-item__name" [title]="folder.name">{{ folder.name }}</span>
+              </div>
+            }
+            @for (file of section.files; track file.id) {
+              <div class="home-item">
+                <i class="ti home-item__icon {{ getFileIcon(file.name).icon }} {{ getFileIcon(file.name).colorClass }}"></i>
+                <span class="home-item__name" [title]="file.name">{{ file.name }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

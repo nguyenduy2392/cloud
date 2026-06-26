@@ -1,0 +1,16 @@
+<div
+  class="wrapper mobile-shell mobile-shell--root d-flex flex-column"
+  [class.mobile-shell--bottom-nav]="hasBottomNav"
+>
+  <app-mobile-topbar class="mobile-shell__top flex-shrink-0" />
+
+  <div class="mobile-shell__scroll flex-grow-1 min-h-0">
+    <div class="page-content d-flex flex-column min-h-100">
+      <div class="page-container flex-grow-1">
+        <router-outlet />
+      </div>
+    </div>
+  </div>
+
+  <mobile-bottom-nav />
+</div>

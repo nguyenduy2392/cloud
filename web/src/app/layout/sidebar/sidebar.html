@@ -1,0 +1,178 @@
+<div class="sidenav-menu">
+  <app-logo-box />
+
+  <button class="button-sm-hover">
+    <i class="ti ti-circle align-middle"></i>
+  </button>
+
+  <button class="button-close-fullsidebar">
+    <i class="ti ti-x align-middle"></i>
+  </button>
+
+  <ngx-simplebar data-simplebar>
+    <ul class="side-nav">
+      @for (item of menuItems; track item.label; let first = $first) {
+        @if (item.isTitle) {
+          <li class="side-nav-title">{{ item.label }}</li>
+        } @else {
+          @if (hasSubmenu(item)) {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItemWithChildren;
+                context: {
+                  menu: item,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  subMenuClassNames: 'sub-menu',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          } @else {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItem;
+                context: {
+                  menu: item,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          }
+        }
+      }
+    </ul>
+
+    @if (storageInfo) {
+      <div class="px-3 py-3 border-top mt-2">
+        <div class="d-flex align-items-center mb-1">
+          <i class="ti ti-cloud me-2 text-muted small"></i>
+          <small class="text-muted">Dung lượng</small>
+        </div>
+        <div class="progress mb-1" style="height: 5px;">
+          <div
+            class="progress-bar {{ storageBarClass }}"
+            role="progressbar"
+            [style.width.%]="storagePercent"
+          ></div>
+        </div>
+        <small class="text-muted" style="font-size: 0.7rem;">{{ storageUsageLabel }}</small>
+      </div>
+    }
+
+    <div class="clearfix"></div>
+  </ngx-simplebar>
+</div>
+
+<ng-template
+  #MenuItemWithChildren
+  let-menu="menu"
+  let-itemClassName="itemClassName"
+  let-linkClassName="linkClassName"
+  let-subMenuClassNames="subMenuClassNames"
+>
+  <li [class]="itemClassName"  [ngClass]="{ active: activeMenuItems.includes(menu.key) }">
+    <a
+      [class]="linkClassName"
+     
+      (click)="toggleMenuItem(menu, collapse)"
+      role="button"
+      [attr.aria-expanded]="!menu.collapsed"
+      aria-controls="sidebarDashboards"
+      [attr.aria-controls]="menu.key"
+    >
+      @if (menu.icon) {
+        <span class="menu-icon">
+          <i class="{{ menu.icon }}"></i>
+        </span>
+      }
+      <span class="menu-text"> {{ menu.label }} </span>
+      <span class="menu-arrow"></span>
+    </a>
+    <div
+      #collapse="ngbCollapse"
+      [(ngbCollapse)]="menu.collapsed"
+      class="collapse"
+      id="sidebarDashboards"
+    >
+      <ul [class]="subMenuClassNames">
+        @for (child of menu.children; track child.label) {
+          @if (hasSubmenu(child)) {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItemWithChildren;
+                context: {
+                  menu: child,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                  subMenuClassNames: 'sub-menu',
+                }
+              "
+            >
+            </ng-container>
+          } @else {
+            <ng-container
+              *ngTemplateOutlet="
+                MenuItem;
+                context: {
+                  menu: child,
+                  linkClassName: 'side-nav-link nav-link-ref',
+                  itemClassName: 'side-nav-item',
+                }
+              "
+            >
+            </ng-container>
+          }
+        }
+      </ul>
+    </div>
+  </li>
+</ng-template>
+
+<ng-template
+  #MenuItem
+  let-menu="menu"
+  let-linkClassName="linkClassName"
+  let-itemClassName="itemClassName"
+>
+  <li
+    [class]="itemClassName"
+    [ngClass]="{ active: activeMenuItems.includes(menu.key) }"
+  >
+    <ng-container
+      *ngTemplateOutlet="
+        MenuItemLink;
+        context: { menu: menu, className: linkClassName }
+      "
+    >
+    </ng-container>
+  </li>
+</ng-template>
+
+<ng-template #MenuItemLink let-menu="menu" let-className="className">
+  <a
+    [routerLink]="menu.url"
+    [class]="className"
+    [ngClass]="{
+      active: activeMenuItems.includes(menu.key),
+      disabled: menu.isDisabled,
+    }"
+    [attr.aria-controls]="menu.key"
+  >
+    @if (menu.icon) {
+      <span class="menu-icon">
+        <i class="{{ menu.icon }}"></i>
+      </span>
+      <span class="menu-text">{{ menu.label }}</span>
+    } @else {
+      {{ menu.label }}
+    }
+    @if (menu.badge) {
+      <span class="badge rounded-pill text-end bg-{{ menu.badge.variant }}">{{
+        menu.badge.text
+      }}</span>
+    }
+  </a>
+</ng-template>

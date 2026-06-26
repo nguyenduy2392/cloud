@@ -1,0 +1,82 @@
+@if (items.length > 0) {
+  <nav class="mobile-bottom-nav" aria-label="Menu điều hướng mobile">
+   
+
+    <div class="mobile-bottom-nav__bar">
+      <div class="mobile-bottom-nav__row">
+        @for (item of leftItems; track $index) {
+          <ng-container *ngTemplateOutlet="tabLink; context: { $implicit: item }" />
+        }
+
+        @if (centerItem) {
+          <div class="mobile-bottom-nav__center">
+            @if (centerItem.url) {
+              <a
+                [routerLink]="centerItem.url"
+                routerLinkActive="mobile-bottom-nav__fab--active"
+                [routerLinkActiveOptions]="
+                  centerItem.exact ? { exact: true } : { exact: false }
+                "
+                class="mobile-bottom-nav__fab"
+              >
+                @if (centerItem.icon) {
+                  <i [class]="centerItem.icon + ' mobile-bottom-nav__fab-icon'"></i>
+                }
+              </a>
+            } @else {
+              <span class="mobile-bottom-nav__fab" role="presentation">
+                @if (centerItem.icon) {
+                  <i [class]="centerItem.icon + ' mobile-bottom-nav__fab-icon'"></i>
+                }
+              </span>
+            }
+            <span class="mobile-bottom-nav__fab-label">{{ centerItem.label }}</span>
+          </div>
+        }
+
+        @for (item of rightItems; track $index) {
+          <ng-container *ngTemplateOutlet="tabLink; context: { $implicit: item }" />
+        }
+      </div>
+    </div>
+  </nav>
+}
+
+<ng-template #tabLink let-item>
+  <div class="mobile-bottom-nav__tab">
+    @if (item.url) {
+      <a
+        [routerLink]="item.url"
+        routerLinkActive="mobile-bottom-nav__tab-link--active"
+        [routerLinkActiveOptions]="
+          item.exact ? { exact: true } : { exact: false }
+        "
+        class="mobile-bottom-nav__tab-link"
+      >
+        @if (item.icon) {
+          <i [class]="item.icon + ' mobile-bottom-nav__tab-icon'"></i>
+        }
+        <span class="mobile-bottom-nav__tab-label">{{ item.label }}</span>
+      </a>
+    } @else if (item.moreAction === 'profile-drawer') {
+      <button
+        type="button"
+        class="mobile-bottom-nav__tab-link"
+        (click)="openProfileDrawer()"
+        [attr.aria-label]="item.label"
+      >
+        @if (item.icon) {
+          <i [class]="item.icon + ' mobile-bottom-nav__tab-icon'"></i>
+        }
+        <span class="mobile-bottom-nav__tab-label">{{ item.label }}</span>
+      </button>
+    } @else {
+      <span class="mobile-bottom-nav__tab-link mobile-bottom-nav__tab-link--disabled">
+        @if (item.icon) {
+          <i [class]="item.icon + ' mobile-bottom-nav__tab-icon'"></i>
+        }
+        <span class="mobile-bottom-nav__tab-label">{{ item.label }}</span>
+      </span>
+    }
+  </div>
+</ng-template>
