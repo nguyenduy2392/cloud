@@ -8,11 +8,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.CloudServices
 {
+    public class SyncUserDto
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? SsoId { get; set; }
+        public string Database { get; set; } = string.Empty;
+    }
+
     public interface IDatabaseService
     {
         Task<Response> RunMigrationAsync(string? identity);
         Task<Response> InitializeDatabaseAsync(string databaseName, string userName, string password);
         Task<Response> BackfillKeywordsAsync(string? identity = null);
+        Task<Response> SyncUserAsync(SyncUserDto request);
     }
 
     public class DatabaseService : IDatabaseService
@@ -138,6 +150,62 @@ namespace Application.CloudServices
             {
                 _logger.LogError(ex, "Error backfilling keywords.");
                 return Response.Fail($"Backfill failed: {ex.Message}");
+            }
+        }
+
+        public async Task<Response> SyncUserAsync(SyncUserDto request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Database) || string.IsNullOrWhiteSpace(request.UserName))
+                    return Response.Fail("Database and UserName are required.");
+
+                var connStr = _accessor.GetConnectionString(request.Database);
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+                optionsBuilder.UseSqlServer(connStr);
+                await using var context = new AppDbContext(optionsBuilder.Options);
+
+                Guid? ssoId = Guid.TryParse(request.SsoId, out var parsed) ? parsed : null;
+
+                var existing = ssoId.HasValue
+                    ? await context.Users.FirstOrDefaultAsync(u => u.SsoId == ssoId && !u.IsDeleted)
+                    : await context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName && !u.IsDeleted);
+
+                if (existing != null)
+                {
+                    existing.Password = request.PasswordHash;
+                    if (!string.IsNullOrEmpty(request.Name)) existing.Name = request.Name;
+                    if (!string.IsNullOrEmpty(request.Email)) existing.Email = request.Email;
+                    if (!string.IsNullOrEmpty(request.Phone)) existing.Phone = request.Phone;
+                    if (ssoId.HasValue) existing.SsoId = ssoId;
+                    await context.SaveChangesAsync();
+                    return Response.Success(new { action = "updated", userId = existing.Id });
+                }
+
+                var newUser = new Core.Entities.AppUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = request.UserName,
+                    Password = request.PasswordHash,
+                    Name = request.Name ?? string.Empty,
+                    Email = request.Email ?? string.Empty,
+                    Phone = request.Phone ?? string.Empty,
+                    SsoId = ssoId,
+                    IsRootAdmin = false,
+                    CreatedAt = DateTime.Now,
+                    ModifiedAt = DateTime.Now,
+                };
+                await context.Users.AddAsync(newUser);
+                await context.SaveChangesAsync();
+
+                _logger.LogInformation("SyncUser: created Cloud user {UserName} (SsoId={SsoId}) in {Database}",
+                    request.UserName, request.SsoId, request.Database);
+                return Response.Success(new { action = "created", userId = newUser.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SyncUser failed for {UserName} in {Database}", request.UserName, request.Database);
+                return Response.Fail($"Sync user failed: {ex.Message}");
             }
         }
     }

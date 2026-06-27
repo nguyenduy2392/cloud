@@ -34,6 +34,13 @@ namespace Api.Controllers
         {
             return Ok(await _service.BackfillKeywordsAsync(identity));
         }
+
+        [AllowAnonymous]
+        [HttpPost("sync-user")]
+        public async Task<IActionResult> SyncUser([FromBody] SyncUserDto request)
+        {
+            return Ok(await _service.SyncUserAsync(request));
+        }
     }
 
     public class InitializeDatabaseRequest
