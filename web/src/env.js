@@ -12,14 +12,14 @@
     'dev-cloud.happyecotech.com': {
       baseApiUrl: '',
       ssoUrl: 'https://dev-sso.happyecotech.com',
-      ssoApiUrl: 'https://dev-sso-api.happyecotech.com',
+      ssoApiUrl: 'https://dev-sso.happyecotech.com',
       ssoClientId: 'cloud',
       ssoRedirectUri: 'https://dev-cloud.happyecotech.com/sso-callback'
     },
     'cloud.happyecotech.com': {
       baseApiUrl: '',
       ssoUrl: 'https://sso.happyecotech.com',
-      ssoApiUrl: 'https://sso-api.happyecotech.com',
+      ssoApiUrl: 'https://sso.happyecotech.com',
       ssoClientId: 'cloud',
       ssoRedirectUri: 'https://cloud.happyecotech.com/sso-callback'
     }
