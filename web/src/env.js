@@ -9,12 +9,19 @@
       ssoClientId: 'cloud',
       ssoRedirectUri: 'http://localhost:4202/sso-callback'
     },
-    'minicrm.happyecotech.com': {
+    'dev-cloud.happyecotech.com': {
+      baseApiUrl: '',
+      ssoUrl: 'https://dev-sso.happyecotech.com',
+      ssoApiUrl: 'https://dev-sso-api.happyecotech.com',
+      ssoClientId: 'cloud',
+      ssoRedirectUri: 'https://dev-cloud.happyecotech.com/sso-callback'
+    },
+    'cloud.happyecotech.com': {
       baseApiUrl: '',
       ssoUrl: 'https://sso.happyecotech.com',
       ssoApiUrl: 'https://sso-api.happyecotech.com',
       ssoClientId: 'cloud',
-      ssoRedirectUri: 'https://minicrm.happyecotech.com/sso-callback'
+      ssoRedirectUri: 'https://cloud.happyecotech.com/sso-callback'
     }
   };
 })(this);
