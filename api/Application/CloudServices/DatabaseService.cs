@@ -87,8 +87,6 @@ namespace Application.CloudServices
         public async Task<Response> InitializeDatabaseAsync(string databaseName, string userName, string password)
         {
             if (string.IsNullOrWhiteSpace(databaseName)) return Response.Fail("Tên database không được để trống.");
-            if (string.IsNullOrWhiteSpace(userName)) return Response.Fail("Tên đăng nhập không được để trống.");
-            if (string.IsNullOrWhiteSpace(password)) return Response.Fail("Mật khẩu không được để trống.");
 
             try
             {
@@ -103,15 +101,8 @@ namespace Application.CloudServices
                 await using var context = new AppDbContext(optionsBuilder.Options);
                 await context.Database.MigrateAsync();
 
-                var admin = await context.Users.FirstOrDefaultAsync(x => x.IsRootAdmin && !x.IsDeleted);
-                if (admin != null)
-                {
-                    admin.UserName = userName.Trim();
-                    admin.Password = _cryptorFactory.ToHashPassword(password);
-                    await context.SaveChangesAsync();
-                }
-
-                return Response.Success(new { Database = dbFullName, DefaultUser = new { UserName = userName.Trim() } });
+                _logger.LogInformation("InitializeDatabaseAsync: Database {Database} created/migrated.", dbFullName);
+                return Response.Success(new { Database = dbFullName });
             }
             catch (Exception ex)
             {
