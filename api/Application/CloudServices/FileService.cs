@@ -363,7 +363,7 @@ namespace Application.CloudServices
                 {
                     UserId = userId,
                     UsedBytes = Math.Max(0, deltaBytes),
-                    MaxBytes = 1_073_741_824 // 1 GB default
+                    MaxBytes = 5_368_709_120 // 5 GB default
                 };
                 await _repository.AddAsync(storage);
             }

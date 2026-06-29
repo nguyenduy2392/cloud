@@ -1,4 +1,4 @@
-# Mini CRM
+# Cloud
 
 Ứng dụng quản lý bán hàng / khách hàng: giao diện **Angular (PWA)** và **API ASP.NET Core** với **SQL Server**, xác thực **JWT**, phân quyền theo **vai trò–mã quyền** chi tiết, kèm **báo cáo tổng hợp** và **gia hạn hợp đồng tự động** bằng tác vụ nền.
 
@@ -19,7 +19,7 @@
 
 | Thành phần | Công nghệ | Mô tả |
 |------------|-----------|--------|
-| **Web** | Angular 21, TypeScript, SCSS, Bootstrap 5, `@ng-bootstrap/ng-bootstrap` | SPA; build `web/dist/mini-crm`. Production bật **Service Worker** (`ngsw-config.json`). `manifest.webmanifest` đặt tên ứng dụng *Mini CRM*. |
+| **Web** | Angular 21, TypeScript, SCSS, Bootstrap 5, `@ng-bootstrap/ng-bootstrap` | SPA; build `web/dist/mini-crm`. Production bật **Service Worker** (`ngsw-config.json`). `manifest.webmanifest` đặt tên ứng dụng *Cloud*. |
 | **API** | .NET 8, EF Core 8, SQL Server | REST, Swagger, Serilog, **Quartz** (job nền), EPPlus, DinkToPdf, QRCoder, SkiaSharp, v.v. |
 | **Tầng nghiệp vụ** | `api/Application` | Auth, khách hàng, hợp đồng, lịch sử hợp đồng, user/role, báo cáo, master data khách hàng, audit. |
 | **Dữ liệu** | `api/Core` | `AppDbContext`, thực thể, **migrations** EF (assembly: `Core`). |

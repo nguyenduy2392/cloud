@@ -12,6 +12,6 @@ namespace Core.Entities
 
         public long UsedBytes { get; set; }
 
-        public long MaxBytes { get; set; } = 1_073_741_824; // 1 GB
+        public long MaxBytes { get; set; } = 5_368_709_120; // 5 GB
     }
 }

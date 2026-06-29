@@ -30,7 +30,7 @@ export class TitleService {
 
     if (route.snapshot.data['title']) {
       this.titleService.setTitle(
-        route.snapshot.data['title'] + ' | Mini CRM Happy Eco Tech'
+        route.snapshot.data['title'] + ' | Cloud Happy Eco Tech'
       )
     }
   }

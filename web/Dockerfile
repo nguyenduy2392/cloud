@@ -13,7 +13,7 @@ FROM nginx:alpine
 
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY --from=build-step /app/dist/mini-crm/browser /usr/share/nginx/html
+COPY --from=build-step /app/dist/cloud/browser /usr/share/nginx/html
 
 RUN echo 'server { \
     listen 80; \

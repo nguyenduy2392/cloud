@@ -9,6 +9,15 @@
     <meta name="theme-color" content="#3b5de7"/>
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
     <script src="env.js"></script>
+    <script>
+      if (window.location.pathname === '/sso-logout') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('database');
+        document.write('<p>Logged out</p>');
+        throw new Error('sso-logout');
+      }
+    </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbvyBxmMbFhrzP9Z8moyYr6dCr-pzjhBE"></script>
     <style>
       #splash-screen {

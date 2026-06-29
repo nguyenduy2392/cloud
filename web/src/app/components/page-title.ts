@@ -28,7 +28,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
       <div class="text-end">
         <ol class="breadcrumb m-0 py-0 fs-13">
           <li class="breadcrumb-item">
-            <a href="javascript: void(0);">Mini CRM</a>
+            <a href="javascript: void(0);">Cloud</a>
           </li>
           @if (subtitle) {
             <li class="breadcrumb-item">
