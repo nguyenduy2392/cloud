@@ -4,8 +4,10 @@
   window.__env.tenantMap = {
     'localhost': {
       baseApiUrl: 'http://localhost:5124',
-      ssoUrl: 'http://localhost:4201',
-      ssoApiUrl: 'http://localhost:5265',
+      // ssoUrl: 'http://localhost:4201',
+      // ssoApiUrl: 'http://localhost:5265',
+      ssoUrl: 'https://dev-sso.happyecotech.com',
+      ssoApiUrl: 'https://dev-sso.happyecotech.com',
       ssoClientId: 'cloud',
       ssoRedirectUri: 'http://localhost:4202/sso-callback'
     },
