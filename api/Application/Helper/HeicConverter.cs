@@ -15,7 +15,29 @@ namespace Application.Helper
             ".heic", ".heif"
         };
 
+        private static readonly Dictionary<string, string> ImageContentTypeExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["image/jpeg"] = ".jpg",
+            ["image/jpg"] = ".jpg",
+            ["image/png"] = ".png",
+            ["image/gif"] = ".gif",
+            ["image/webp"] = ".webp",
+            ["image/bmp"] = ".bmp",
+        };
+
         public static bool IsHeic(string extension) => HeicExtensions.Contains(extension);
+
+        /// <summary>
+        /// Trả về đuôi file tương ứng với ContentType nếu là 1 định dạng ảnh phổ biến (jpeg/png/...).
+        /// Một số app mobile (image picker iOS) tự convert HEIC -> JPEG nhưng vẫn giữ nguyên tên file gốc .HEIC,
+        /// nên không thể tin tưởng hoàn toàn vào đuôi file để biết định dạng thực tế.
+        /// </summary>
+        public static string? ExtensionFromContentType(string? contentType)
+        {
+            if (string.IsNullOrWhiteSpace(contentType)) return null;
+            var normalized = contentType.Split(';')[0].Trim();
+            return ImageContentTypeExtensions.TryGetValue(normalized, out var ext) ? ext : null;
+        }
 
         public static async Task<bool> ConvertToJpegAsync(string sourcePath, string destPath, ILogger logger)
         {

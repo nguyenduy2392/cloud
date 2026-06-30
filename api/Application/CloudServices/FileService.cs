@@ -101,6 +101,19 @@ namespace Application.CloudServices
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
                 var contentType = file.ContentType ?? "application/octet-stream";
                 var displayName = file.FileName;
+
+                // Một số app mobile (image picker iOS) tự convert HEIC -> JPEG nhưng vẫn giữ tên file gốc .HEIC
+                // => nếu đuôi file báo heic/heif nhưng ContentType lại là 1 định dạng ảnh cụ thể khác, tin theo ContentType
+                if (HeicConverter.IsHeic(extension))
+                {
+                    var realExtension = HeicConverter.ExtensionFromContentType(contentType);
+                    if (realExtension != null && realExtension != extension)
+                    {
+                        extension = realExtension;
+                        displayName = Path.GetFileNameWithoutExtension(file.FileName) + extension;
+                    }
+                }
+
                 var storedFileName = $"{fileId}{extension}";
 
                 // Build storage path
