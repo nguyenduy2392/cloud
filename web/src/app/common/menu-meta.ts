@@ -52,6 +52,12 @@ export const APP_PRIMARY_MENU: MenuItemType[] = [
     icon: 'ti ti-clock',
     url: '/recent',
   },
+  {
+    key: 'trash',
+    label: 'Thùng rác',
+    icon: 'ti ti-trash',
+    url: '/trash',
+  },
 ]
 
 export const MENU_ITEMS: MenuItemType[] = [

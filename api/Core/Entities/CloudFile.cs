@@ -35,5 +35,8 @@ namespace Core.Entities
 
         [ForeignKey(nameof(OwnerId))]
         public virtual AppUser Owner { get; set; } = null!;
+
+        /// <summary>Thời điểm người dùng chuyển vào thùng rác. null = chưa xoá hoặc xoá ngầm do folder cha bị xoá.</summary>
+        public DateTime? DeletedAt { get; set; }
     }
 }

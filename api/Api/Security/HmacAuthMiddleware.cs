@@ -27,7 +27,8 @@ public class HmacAuthMiddleware
         "/api/folders",
         "/api/files",
         "/api/resource-permissions",
-        "/api/user-storage"
+        "/api/user-storage",
+        "/api/trash"
     };
 
     public HmacAuthMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<HmacAuthMiddleware> logger, IServiceScopeFactory scopeFactory)
