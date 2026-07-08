@@ -536,7 +536,7 @@ export class MyCloudComponent implements OnInit, OnDestroy {
     })
     const dlg = ref.componentInstance
     dlg.title = 'Xóa thư mục'
-    dlg.message = `Xóa thư mục "${folder.name}" và toàn bộ nội dung bên trong? Hành động này không thể hoàn tác.`
+    dlg.message = `Chuyển thư mục "${folder.name}" và toàn bộ nội dung vào thùng rác?`
     dlg.confirmLabel = 'Xóa'
     dlg.danger = true
     ref.closed.subscribe((confirmed: boolean) => {
@@ -563,7 +563,7 @@ export class MyCloudComponent implements OnInit, OnDestroy {
     })
     const dlg = ref.componentInstance
     dlg.title = 'Xóa tệp'
-    dlg.message = `Xóa tệp "${file.name}"? Hành động này không thể hoàn tác.`
+    dlg.message = `Chuyển tệp "${file.name}" vào thùng rác?`
     dlg.confirmLabel = 'Xóa'
     dlg.danger = true
     ref.closed.subscribe((confirmed: boolean) => {

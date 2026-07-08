@@ -12,10 +12,11 @@ namespace Application.CloudServices
     public interface IFileService
     {
         Task<Response> GetByIdAsync(Guid id);
-        Task<Response> UploadAsync(IFormFile file, Guid? folderId);
+        Task<Response> UploadAsync(IFormFile file, Guid? folderId, string? folderTag = null);
         Task<(Stream? Stream, string FileName, string ContentType)> DownloadAsync(Guid id);
         Task<Response> RenameAsync(Guid id, string newName);
         Task<Response> MoveAsync(Guid id, Guid? newFolderId);
+        Task<Response> MoveToTaggedFolderAsync(Guid id, string tag, string displayName);
         Task<Response> DeleteAsync(Guid id);
         Task<Response> BulkDeleteAsync(List<Guid> ids);
     }
@@ -69,7 +70,7 @@ namespace Application.CloudServices
             }
         }
 
-        public async Task<Response> UploadAsync(IFormFile file, Guid? folderId)
+        public async Task<Response> UploadAsync(IFormFile file, Guid? folderId, string? folderTag = null)
         {
             if (file == null || file.Length == 0)
                 return Response.Fail("Please select a file to upload.");
@@ -78,6 +79,10 @@ namespace Application.CloudServices
             {
                 var currentUserId = _accessor.GetCurrentUserId();
                 var dbName = _accessor.GetDatabaseName()?.ToLower() ?? "default";
+
+                // Nếu có folderTag thì tự get-or-create thư mục hệ thống cho user này
+                if (!string.IsNullOrEmpty(folderTag))
+                    folderId = await GetOrCreateTaggedFolderAsync(currentUserId!.Value, folderTag);
 
                 // Check storage quota
                 var storage = await _repository.FindAsync<CloudUserStorage>(
@@ -290,13 +295,13 @@ namespace Application.CloudServices
                 var fileSize = file.SizeInBytes;
                 var ownerId = file.OwnerId;
 
+                file.DeletedAt = DateTime.UtcNow;
                 await _repository.DeleteSoftAsync(file);
 
                 // Recalculate folder size
                 await RecalculateFolderSizeAsync(folderId);
 
-                // Decrement user storage
-                await UpdateUserStorageAsync(ownerId, -fileSize);
+                // Dung lượng chỉ giảm khi xóa vĩnh viễn khỏi thùng rác, không giảm khi chuyển vào thùng rác
 
                 _logger.LogInformation("Deleted file [{Id}] by [{By}].", id, _accessor.GetCurrentUserId());
                 return Response.Success();
@@ -327,10 +332,12 @@ namespace Application.CloudServices
                 var totalSize = files.Sum(f => f.SizeInBytes);
                 var ownerId = files.First().OwnerId;
 
+                var now = DateTime.UtcNow;
                 foreach (var file in files)
                 {
                     file.IsDeleted = true;
-                    file.ModifiedAt = DateTime.Now;
+                    file.ModifiedAt = now;
+                    file.DeletedAt = now;
                 }
 
                 await _repository.UpdateRangeAsync(files, saveChanges: true);
@@ -341,8 +348,7 @@ namespace Application.CloudServices
                     await RecalculateFolderSizeAsync(folderId);
                 }
 
-                // Decrement user storage
-                await UpdateUserStorageAsync(ownerId, -totalSize);
+                // Dung lượng chỉ giảm khi xóa vĩnh viễn khỏi thùng rác, không giảm khi chuyển vào thùng rác
 
                 _logger.LogInformation("Bulk deleted [{Count}] files by [{By}].", files.Count, _accessor.GetCurrentUserId());
                 return Response.Success(new { deleted = files.Count });
@@ -355,6 +361,75 @@ namespace Application.CloudServices
         }
 
         #region Private methods
+
+        private static readonly Dictionary<string, string> TagDisplayNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["taskflow-received"] = "Taskflow Received Files",
+            ["hrm-other"] = "Other files"
+        };
+
+        private async Task<Guid?> GetOrCreateTaggedFolderAsync(Guid userId, string tag, string? displayName = null)
+        {
+            var finalDisplayName = displayName
+                ?? (TagDisplayNames.TryGetValue(tag, out var dn) ? dn : tag);
+
+            var existing = await _repository.GetQueryable<CloudFolder>()
+                .Where(f => f.OwnerId == userId && f.Tag == tag && !f.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (existing != null)
+            {
+                if (existing.Name != finalDisplayName)
+                {
+                    existing.Name = finalDisplayName;
+                    existing.Keyword = Helper.StringHelper.BuildKeyword(finalDisplayName);
+                    await _repository.UpdateAsync(existing, saveChanges: true);
+                }
+                return existing.Id;
+            }
+
+            var folder = new CloudFolder
+            {
+                Name = finalDisplayName,
+                Keyword = Helper.StringHelper.BuildKeyword(finalDisplayName),
+                ParentId = null,
+                OwnerId = userId,
+                SizeInBytes = 0,
+                Tag = tag
+            };
+            var result = await _repository.AddAsync(folder);
+            _logger.LogInformation("Auto-created tagged folder [{Tag}] for user [{UserId}].", tag, userId);
+            return result.Id;
+        }
+
+        public async Task<Response> MoveToTaggedFolderAsync(Guid id, string tag, string displayName)
+        {
+            if (id == Guid.Empty) return Response.Fail("Id is invalid.");
+            if (string.IsNullOrWhiteSpace(tag)) return Response.Fail("Tag is required.");
+
+            try
+            {
+                var file = await _repository.FindAsync<CloudFile>(f => f.Id == id && !f.IsDeleted);
+                if (file == null) return Response.Fail("File not found.");
+
+                var folderId = await GetOrCreateTaggedFolderAsync(file.OwnerId, tag, displayName);
+
+                var oldFolderId = file.FolderId;
+                file.FolderId = folderId;
+                await _repository.UpdateAsync(file, saveChanges: true);
+
+                await RecalculateFolderSizeAsync(oldFolderId);
+                await RecalculateFolderSizeAsync(folderId);
+
+                _logger.LogInformation("Moved file [{Id}] to tagged folder [{Tag}].", id, tag);
+                return Response.Success(new { file.Id, file.FolderId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error moving file [{Id}] to tagged folder [{Tag}].", id, tag);
+                return Response.Fail($"Failed to move file: {ex.Message}");
+            }
+        }
 
         private async Task RecalculateFolderSizeAsync(Guid? folderId)
         {

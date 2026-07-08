@@ -19,6 +19,10 @@ namespace Core.Entities
         [StringLength(1000)]
         public string Keyword { get; set; } = string.Empty;
 
+        /// <summary>Thư mục hệ thống (vd: "taskflow-received"). Không thể đổi tên/di chuyển.</summary>
+        [StringLength(100)]
+        public string? Tag { get; set; }
+
         public Guid OwnerId { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
@@ -26,5 +30,8 @@ namespace Core.Entities
 
         public virtual ICollection<CloudFolder> Children { get; set; } = new List<CloudFolder>();
         public virtual ICollection<CloudFile> Files { get; set; } = new List<CloudFile>();
+
+        /// <summary>Thời điểm người dùng chuyển vào thùng rác. null = chưa xoá hoặc xoá ngầm do folder cha bị xoá.</summary>
+        public DateTime? DeletedAt { get; set; }
     }
 }

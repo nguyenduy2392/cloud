@@ -55,12 +55,15 @@ namespace Api.Controllers
         [HttpPost("upload")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(MultipartBodyLengthLimit = 10L * 1024 * 1024 * 1024)]
-        public async Task<IActionResult> Upload([FromForm] IFormFile file, [FromForm] Guid? folderId)
+        public async Task<IActionResult> Upload(
+            [FromForm] IFormFile file,
+            [FromForm] Guid? folderId,
+            [FromForm] string? folderTag)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(Core.Common.Response.Fail("Please select a file to upload."));
 
-            return Ok(await _service.UploadAsync(file, folderId));
+            return Ok(await _service.UploadAsync(file, folderId, folderTag));
         }
 
         /// <summary>
@@ -79,6 +82,15 @@ namespace Api.Controllers
         public async Task<IActionResult> Move([FromRoute] Guid id, [FromBody] FileMoveRequest request)
         {
             return Ok(await _service.MoveAsync(id, request.FolderId));
+        }
+
+        /// <summary>
+        /// Move a file into a system-tagged folder (get-or-create by tag).
+        /// </summary>
+        [HttpPut("{id:guid}/move-to-tagged-folder")]
+        public async Task<IActionResult> MoveToTaggedFolder([FromRoute] Guid id, [FromBody] MoveToTaggedFolderRequest request)
+        {
+            return Ok(await _service.MoveToTaggedFolderAsync(id, request.Tag, request.DisplayName));
         }
 
         /// <summary>
@@ -108,5 +120,11 @@ namespace Api.Controllers
     public class FileMoveRequest
     {
         public Guid? FolderId { get; set; }
+    }
+
+    public class MoveToTaggedFolderRequest
+    {
+        public string Tag { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Auth.Dtos;
+using Application.CloudServices;
 using Application.Helper;
 using Application.Options;
 using Application.UserServices.Dtos;
@@ -35,6 +36,7 @@ namespace Application.Auth
         private readonly ICryptorFactory _cryptorFactory;
         private readonly IJwtFactory _jwtFactory;
         private readonly IAppContextAccessor _accessor;
+        private readonly ITrashService _trashService;
         private readonly ILogger<AuthService> _logger;
         private readonly AppSetting _setting;
         private readonly SsoSettings _ssoSettings;
@@ -47,6 +49,7 @@ namespace Application.Auth
             IOptions<AppSetting> setting,
             IOptions<SsoSettings> ssoSettings,
             IAppContextAccessor accessor,
+            ITrashService trashService,
             ILogger<AuthService> logger,
             IHttpClientFactory httpClientFactory)
         {
@@ -54,6 +57,7 @@ namespace Application.Auth
             _cryptorFactory = cryptorFactory;
             _jwtFactory = jwtFactory;
             _accessor = accessor;
+            _trashService = trashService;
             _logger = logger;
             _setting = setting.Value;
             _ssoSettings = ssoSettings.Value;
@@ -84,11 +88,12 @@ namespace Application.Auth
             user.LastLogin = DateTime.Now;
             await _context.SaveChangesAsync();
 
+            // Fire-and-forget: xoá vĩnh viễn các item thùng rác quá hạn của user này
+            _ = _trashService.CleanupExpiredTrashAsync(user.Id);
+
             user.Password = string.Empty;
 
-
             _logger.LogInformation($"Người dùng {user.UserName} đã đăng nhập.");
-
 
             return Response.Success(new
             {
@@ -196,6 +201,9 @@ namespace Application.Auth
             if (!string.IsNullOrWhiteSpace(ssoAvatar)) appUser.Avatar = ssoAvatar;
             if (!string.IsNullOrWhiteSpace(ssoDesc)) appUser.Description = ssoDesc;
             await _context.SaveChangesAsync();
+
+            // Fire-and-forget: xoá vĩnh viễn các item thùng rác quá hạn của user này
+            _ = _trashService.CleanupExpiredTrashAsync(appUser.Id);
 
             _logger.LogInformation(
                 "AppUser after: name=[{Name}], email=[{Email}], phone=[{Phone}]",
