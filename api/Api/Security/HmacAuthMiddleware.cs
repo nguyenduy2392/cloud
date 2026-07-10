@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -55,7 +56,17 @@ public class HmacAuthMiddleware
                           && request.Headers.ContainsKey("X-Timestamp")
                           && request.Headers.ContainsKey("X-Signature");
 
+        // System paths called from loopback (localhost) don't need HMAC
+        var isLoopback = context.Connection.RemoteIpAddress != null &&
+                         IPAddress.IsLoopback(context.Connection.RemoteIpAddress);
+
         if (!isSystemPath && !(isProxyPath && hasHmacHeaders))
+        {
+            await _next(context);
+            return;
+        }
+
+        if (isSystemPath && isLoopback)
         {
             await _next(context);
             return;

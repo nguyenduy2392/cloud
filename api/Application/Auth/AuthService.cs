@@ -13,21 +13,16 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Application.Auth
 {
     public interface IAuthService
     {
-        /// <summary>
-        /// Đăng nhập hệ thống
-        /// </summary>
         Task<Response> AuthAsync(LoginRequest model);
-
-        /// <summary>
-        /// Đổi code SSO lấy mini-crm JWT
-        /// </summary>
         Task<Response> SsoCallbackAsync(SsoCallbackRequest model);
+        Task<Response> RefreshAsync(RefreshRequest model);
     }
 
     public class AuthService : IAuthService
@@ -95,9 +90,12 @@ namespace Application.Auth
 
             _logger.LogInformation($"Người dùng {user.UserName} đã đăng nhập.");
 
+            var refreshToken = await CreateRefreshTokenAsync(user.Id, model.Identity);
+
             return Response.Success(new
             {
                 Token = _jwtFactory.GenerateJwt(user, model.Identity),
+                RefreshToken = refreshToken,
                 User = user,
                 Database = model.Identity
             });
@@ -213,12 +211,57 @@ namespace Application.Auth
 
             _logger.LogInformation("SSO callback: user {UserName} đăng nhập qua SSO", appUser.UserName);
 
+            var refreshToken = await CreateRefreshTokenAsync(appUser.Id, model.Identity);
+
             return Response.Success(new
             {
                 Token = _jwtFactory.GenerateJwt(appUser, model.Identity),
+                RefreshToken = refreshToken,
                 User = appUser,
                 Database = model.Identity
             });
+        }
+
+        public async Task<Response> RefreshAsync(RefreshRequest model)
+        {
+            model.Identity = model.Identity.ToUpper();
+            var connString = _accessor.GetConnectionString(model.Identity);
+            _context.Database.SetConnectionString(connString);
+
+            var stored = await _context.AppRefreshTokens
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Token == model.RefreshToken
+                    && r.Identity == model.Identity
+                    && !r.IsRevoked
+                    && r.ExpiresAt > DateTime.UtcNow);
+
+            if (stored is null || stored.User is null || stored.User.IsDeleted)
+                return Response.Fail("Refresh token không hợp lệ hoặc đã hết hạn.");
+
+            stored.IsRevoked = true;
+
+            var newRefreshToken = await CreateRefreshTokenAsync(stored.UserId, model.Identity);
+
+            return Response.Success(new
+            {
+                Token = _jwtFactory.GenerateJwt(stored.User, model.Identity),
+                RefreshToken = newRefreshToken
+            });
+        }
+
+        private async Task<string> CreateRefreshTokenAsync(Guid userId, string identity)
+        {
+            var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            _context.AppRefreshTokens.Add(new AppRefreshToken
+            {
+                UserId = userId,
+                Token = token,
+                Identity = identity,
+                ExpiresAt = DateTime.UtcNow.AddDays(_setting.RefreshTokenDays),
+                IsRevoked = false
+            });
+            await _context.SaveChangesAsync();
+            return token;
         }
 
         /// <summary>

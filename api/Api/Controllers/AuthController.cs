@@ -38,5 +38,13 @@ namespace Api.Controllers
             var response = await _service.SsoCallbackAsync(model);
             return Ok(response);
         }
+
+        [AllowAnonymous]
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest model)
+        {
+            var response = await _service.RefreshAsync(model);
+            return Ok(response);
+        }
     }
 }

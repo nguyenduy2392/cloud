@@ -58,7 +58,7 @@ namespace Application.Auth
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddSeconds(_setting.ExpiredIn > 0 ? _setting.ExpiredIn : 86400),
                 SigningCredentials = creds
             };
 

@@ -30,4 +30,13 @@ namespace Application.Auth.Dtos
         public string Code { get; set; } = string.Empty;
         public string? Identity { get; set; }
     }
+
+    public class RefreshRequest
+    {
+        [Required]
+        public string RefreshToken { get; set; } = string.Empty;
+
+        [Required]
+        public string Identity { get; set; } = string.Empty;
+    }
 }
