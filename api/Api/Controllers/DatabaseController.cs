@@ -36,6 +36,13 @@ namespace Api.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("database/rename")]
+        public async Task<IActionResult> RenameDatabase([FromQuery] string oldName, [FromQuery] string newName)
+        {
+            return Ok(await _service.RenameDatabaseAsync(oldName, newName));
+        }
+
+        [AllowAnonymous]
         [HttpPost("sync-user")]
         public async Task<IActionResult> SyncUser([FromBody] SyncUserDto request)
         {
