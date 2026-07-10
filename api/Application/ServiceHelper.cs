@@ -23,6 +23,7 @@ namespace Application
             builder.Services.AddScoped<IResourcePermissionService, ResourcePermissionService>();
             builder.Services.AddScoped<IUserStorageService, UserStorageService>();
             builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+            builder.Services.AddScoped<ITrashService, TrashService>();
         }
     }
 }

@@ -243,6 +243,9 @@ namespace Application.CloudServices
                     f => f.Id == id && !f.IsDeleted);
                 if (folder == null) return Response.Fail("Folder not found.");
 
+                if (!string.IsNullOrEmpty(folder.Tag))
+                    return Response.Fail("Thư mục hệ thống không thể đổi tên.");
+
                 // Check duplicate name in same parent
                 var duplicate = await _repository.IsExistsAsync<CloudFolder>(
                     f => f.Id != id && f.Name == newName.Trim() && f.ParentId == folder.ParentId
@@ -272,6 +275,9 @@ namespace Application.CloudServices
                 var folder = await _repository.FindAsync<CloudFolder>(
                     f => f.Id == id && !f.IsDeleted);
                 if (folder == null) return Response.Fail("Folder not found.");
+
+                if (!string.IsNullOrEmpty(folder.Tag))
+                    return Response.Fail("Thư mục hệ thống không thể di chuyển.");
 
                 // Prevent moving to itself
                 if (newParentId.HasValue && newParentId.Value == id)
@@ -318,10 +324,11 @@ namespace Application.CloudServices
 
                 var parentId = folder.ParentId;
 
-                // Recursively soft delete all children and files
+                // Recursively soft delete all children and files (no DeletedAt on descendants)
                 await SoftDeleteRecursiveAsync(id);
 
-                // Soft delete the folder itself
+                // Soft delete the root folder with DeletedAt so it shows in trash
+                folder.DeletedAt = DateTime.UtcNow;
                 await _repository.DeleteSoftAsync(folder);
 
                 // Recalculate parent folder size

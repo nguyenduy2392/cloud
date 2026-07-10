@@ -128,6 +128,7 @@ export class AuthService {
   /** Xóa token và phiên đăng nhập (dùng cho nút đăng xuất). */
   logout(): void {
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem(USER_STORAGE_KEY)
     localStorage.removeItem('database')
     this.currentUser = null

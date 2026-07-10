@@ -10,6 +10,8 @@
         public int ExpiredIn { get; set; }
 
         public string Secret { get; set; }
+
+        public int RefreshTokenDays { get; set; } = 30;
     }
 
     public class ServerSetting

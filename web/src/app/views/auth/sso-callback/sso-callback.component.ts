@@ -60,10 +60,12 @@ export class SsoCallbackComponent implements OnInit {
             if (res?.isSuccess) {
               const token = res.data?.Token || res.data?.token
               if (token) localStorage.setItem('token', token.trim())
+              const refreshToken = res.data?.RefreshToken || res.data?.refreshToken
+              if (refreshToken) localStorage.setItem('refreshToken', refreshToken)
               if (res.data?.user)
                 localStorage.setItem('user', JSON.stringify(res.data.user))
-              if (res.data?.Database)
-                localStorage.setItem('database', res.data.Database)
+              const db = res.data?.Database || res.data?.database
+              if (db) localStorage.setItem('database', db)
               void this.router.navigate(['/'])
             } else {
               this.errorMsg = res?.message || 'Đăng nhập SSO thất bại.'

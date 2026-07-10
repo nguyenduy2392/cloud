@@ -25,5 +25,6 @@ namespace Core
         public DbSet<CloudFile> CloudFiles { get; set; }
         public DbSet<CloudResourcePermission> CloudResourcePermissions { get; set; }
         public DbSet<CloudUserStorage> CloudUserStorages { get; set; }
+        public DbSet<AppRefreshToken> AppRefreshTokens { get; set; }
     }
 }

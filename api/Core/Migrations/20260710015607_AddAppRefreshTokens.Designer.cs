@@ -4,6 +4,7 @@ using Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260710015607_AddAppRefreshTokens")]
+    partial class AddAppRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,6 +178,26 @@ namespace Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("afd55aae-d6b2-4741-8ada-5131ea70f00d"),
+                            Address = "Headquarters",
+                            Avatar = "",
+                            CreatedAt = new DateTime(2026, 3, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Seeded root administrator account",
+                            Email = "admin@cloud.local",
+                            Gender = 0,
+                            IsDeleted = false,
+                            IsEmployee = true,
+                            IsRootAdmin = true,
+                            ModifiedAt = new DateTime(2026, 3, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "System Administrator",
+                            Password = "cs80krLdOzJuOkLfDeo4h6uG6CS7dErnbCkhpuBFNkk=",
+                            Phone = "0000000000",
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("Core.Entities.CloudFile", b =>

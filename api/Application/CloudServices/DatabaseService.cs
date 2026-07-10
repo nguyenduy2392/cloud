@@ -23,6 +23,7 @@ namespace Application.CloudServices
     {
         Task<Response> RunMigrationAsync(string? identity);
         Task<Response> InitializeDatabaseAsync(string databaseName, string userName, string password);
+        Task<Response> RenameDatabaseAsync(string oldName, string newName);
         Task<Response> BackfillKeywordsAsync(string? identity = null);
         Task<Response> SyncUserAsync(SyncUserDto request);
     }
@@ -108,6 +109,40 @@ namespace Application.CloudServices
             {
                 _logger.LogError(ex, "InitializeDatabaseAsync: Lỗi khi khởi tạo database {Database}.", databaseName);
                 return Response.Fail("Khởi tạo database không thành công.");
+            }
+        }
+
+        public async Task<Response> RenameDatabaseAsync(string oldName, string newName)
+        {
+            if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName))
+                return Response.Fail("Tên database không được để trống.");
+
+            var oldDb = $"Cloud_{oldName.Trim()}";
+            var newDb = $"Cloud_{newName.Trim()}";
+
+            try
+            {
+                var baseConnection = _configuration.GetConnectionString("DefaultConnection")!;
+                var masterConn = System.Text.RegularExpressions.Regex
+                    .Replace(baseConnection, @"Database=[^;]+", "Database=master");
+
+                await using var conn = new Microsoft.Data.SqlClient.SqlConnection(masterConn);
+                await conn.OpenAsync();
+
+                var sql = $@"
+                    ALTER DATABASE [{oldDb}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                    ALTER DATABASE [{oldDb}] MODIFY NAME = [{newDb}];
+                    ALTER DATABASE [{newDb}] SET MULTI_USER;";
+
+                await using var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, conn);
+                await cmd.ExecuteNonQueryAsync();
+
+                return Response.Success(new { OldName = oldDb, NewName = newDb, Message = $"Đã đổi tên {oldDb} → {newDb}" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "RenameDatabaseAsync: {OldDb} → {NewDb}", oldDb, newDb);
+                return Response.Fail($"Đổi tên database thất bại: {ex.Message}");
             }
         }
 
