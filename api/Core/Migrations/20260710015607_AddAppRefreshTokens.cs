@@ -13,35 +13,19 @@ namespace Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AppAttributeOptions");
-
-            migrationBuilder.DropTable(
-                name: "AppAttributeValues");
-
-            migrationBuilder.DropTable(
-                name: "AppRolePermissions");
-
-            migrationBuilder.DropTable(
-                name: "AppRoleUsers");
-
-            migrationBuilder.DropTable(
-                name: "CompanyInfos");
-
-            migrationBuilder.DropTable(
-                name: "UserPreferences");
-
-            migrationBuilder.DropTable(
-                name: "AppAttributes");
-
-            migrationBuilder.DropTable(
-                name: "AppPermissions");
-
-            migrationBuilder.DropTable(
-                name: "AppRoles");
-
-            migrationBuilder.DropTable(
-                name: "AppEntities");
+            // DROP TABLE IF EXISTS thay vì DropTable cứng: các bảng legacy này không tồn tại
+            // trên mọi môi trường (vd. production chưa từng có), DropTable cứng sẽ làm cả
+            // migration abort ngay từ câu lệnh đầu nếu bảng không tồn tại.
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppAttributeOptions];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppAttributeValues];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppRolePermissions];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppRoleUsers];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [CompanyInfos];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [UserPreferences];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppAttributes];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppPermissions];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppRoles];");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AppEntities];");
 
             migrationBuilder.CreateTable(
                 name: "AppRefreshTokens",
