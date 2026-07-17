@@ -19,6 +19,12 @@ namespace Application.CloudServices
         public string Database { get; set; } = string.Empty;
     }
 
+    public class DeleteUserDto
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Database { get; set; } = string.Empty;
+    }
+
     public interface IDatabaseService
     {
         Task<Response> RunMigrationAsync(string? identity);
@@ -26,6 +32,7 @@ namespace Application.CloudServices
         Task<Response> RenameDatabaseAsync(string oldName, string newName);
         Task<Response> BackfillKeywordsAsync(string? identity = null);
         Task<Response> SyncUserAsync(SyncUserDto request);
+        Task<Response> DeleteUserAsync(DeleteUserDto request);
     }
 
     public class DatabaseService : IDatabaseService
@@ -241,6 +248,36 @@ namespace Application.CloudServices
             {
                 _logger.LogError(ex, "SyncUser failed for {UserName} in {Database}", request.UserName, request.Database);
                 return Response.Fail($"Sync user failed: {ex.Message}");
+            }
+        }
+
+        public async Task<Response> DeleteUserAsync(DeleteUserDto request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Database) || string.IsNullOrWhiteSpace(request.UserName))
+                    return Response.Fail("Database and UserName are required.");
+
+                var connStr = _accessor.GetConnectionString(request.Database);
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+                optionsBuilder.UseSqlServer(connStr);
+                await using var context = new AppDbContext(optionsBuilder.Options);
+
+                var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName && !u.IsDeleted);
+                if (user == null)
+                    return Response.Success(new { action = "not_found", message = "User not found or already deleted." });
+
+                user.IsDeleted = true;
+                user.ModifiedAt = DateTime.Now;
+                await context.SaveChangesAsync();
+
+                _logger.LogInformation("DeleteUser: soft-deleted Cloud user {UserName} in {Database}", request.UserName, request.Database);
+                return Response.Success(new { action = "deleted", userId = user.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DeleteUser failed for {UserName} in {Database}", request.UserName, request.Database);
+                return Response.Fail($"Delete user failed: {ex.Message}");
             }
         }
     }
