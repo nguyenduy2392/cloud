@@ -49,6 +49,14 @@ namespace Api.Controllers
             var result = await _service.SyncUserAsync(request);
             return result.IsSuccess ? Ok(result) : StatusCode(500, result);
         }
+
+        [AllowAnonymous]
+        [HttpPost("delete-user")]
+        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserDto request)
+        {
+            var result = await _service.DeleteUserAsync(request);
+            return result.IsSuccess ? Ok(result) : StatusCode(500, result);
+        }
     }
 
     public class InitializeDatabaseRequest
