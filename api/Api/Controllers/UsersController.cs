@@ -1,8 +1,10 @@
+using Application.Helper;
 using Application.UserServices;
 using Application.UserServices.Dtos;
 using Core;
 using Core.Common;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace Api.Controllers
@@ -14,16 +16,23 @@ namespace Api.Controllers
     public class UsersController : BaseController
     {
         private readonly IUserService _service;
+        private readonly ILogger<UsersController> _logger;
         private readonly string _avatarFolder;
+        private readonly string _thumbFolder;
         private readonly string _tenant;
 
-        public UsersController(IUserService service, IAppContextAccessor accessor)
+        public UsersController(IUserService service, IAppContextAccessor accessor, ILogger<UsersController> logger)
         {
             _service = service;
+            _logger = logger;
             _tenant = accessor.GetDatabaseName()?.ToLower() ?? "default";
             _avatarFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data", _tenant, "Avatars");
             if (!Directory.Exists(_avatarFolder))
                 Directory.CreateDirectory(_avatarFolder);
+
+            _thumbFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data", _tenant, "thumb");
+            if (!Directory.Exists(_thumbFolder))
+                Directory.CreateDirectory(_thumbFolder);
         }
 
         /// <summary>
@@ -159,6 +168,10 @@ namespace Api.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
+
+                // Thumbnail — lưu tại Data/{tenant}/thumb/{id}.jpg, best-effort không chặn upload.
+                var thumbPath = Path.Combine(_thumbFolder, $"{id}.jpg");
+                await ThumbnailHelper.GenerateAsync(filePath, ext, thumbPath, _logger);
 
                 // Update avatar path in user
                 var updateResp = await _service.UpdateAvatarAsync(id, $"{_tenant}/Avatars/{fileName}");

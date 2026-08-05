@@ -24,8 +24,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
 # heif-convert (libheif-examples) dùng để convert ảnh HEIC/HEIF (iPhone) sang JPEG khi upload
+# ffmpeg dùng để trích 1 frame làm thumbnail cho file video khi upload
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libheif-examples \
+    && apt-get install -y --no-install-recommends libheif-examples ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8080
