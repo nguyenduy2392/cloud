@@ -155,6 +155,17 @@ namespace Application.CloudServices
 
                 var fileLength = new FileInfo(filePath).Length;
 
+                // Thumbnail (ảnh/video) — lưu tại Data/{tenant}/thumb/{fileId}.jpg, best-effort không chặn upload.
+                if (ThumbnailHelper.IsSupported(extension))
+                {
+                    var thumbDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", dbName, "thumb");
+                    if (!Directory.Exists(thumbDir))
+                        Directory.CreateDirectory(thumbDir);
+
+                    var thumbPath = Path.Combine(thumbDir, $"{fileId}.jpg");
+                    await ThumbnailHelper.GenerateAsync(filePath, extension, thumbPath, _logger);
+                }
+
                 // Create CloudFile record
                 var cloudFile = new CloudFile
                 {
