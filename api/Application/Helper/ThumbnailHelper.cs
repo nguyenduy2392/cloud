@@ -53,12 +53,20 @@ namespace Application.Helper
         private static async Task<bool> GenerateFromImageAsync(string sourcePath, string thumbPath)
         {
             using var image = await Image.LoadAsync(sourcePath);
-            image.Mutate(x => x.Resize(new ResizeOptions
-            {
-                Mode = ResizeMode.Max,
-                Size = new Size(MaxSize, MaxSize)
-            }));
-            await image.SaveAsync(thumbPath, new JpegEncoder { Quality = 80 });
+
+            // ImageSharp không tự bake EXIF orientation vào pixel lúc Load/Resize/Save — phải gọi AutoOrient()
+            // tường minh TRƯỚC Resize, nếu không thumbnail sẽ giữ pixel thô theo chiều cảm biến máy ảnh (thường
+            // là landscape dù ảnh chụp dọc), sai cả tỉ lệ khung lẫn chiều hiển thị trên các viewer không tự đọc
+            // EXIF (vd Image của React Native). AutoOrient() xoay/lật pixel đúng chiều rồi reset tag về 1.
+            image.Mutate(x => x
+                .AutoOrient()
+                .Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(MaxSize, MaxSize)
+                }));
+
+            await image.SaveAsync(thumbPath, new JpegEncoder { Quality = 90 });
             return true;
         }
 
@@ -76,6 +84,7 @@ namespace Application.Helper
                     "-i", sourcePath,
                     "-vframes", "1",
                     "-vf", $"scale='min({MaxSize},iw)':'min({MaxSize},ih)':force_original_aspect_ratio=decrease",
+                    "-q:v", "2", // chất lượng JPEG cao (thang 2-31, càng thấp càng nét, 2 gần như lossless)
                     thumbPath
                 },
                 RedirectStandardOutput = true,
