@@ -59,5 +59,11 @@ namespace Application.UserServices
         /// Cập nhật ảnh đại diện người dùng
         /// </summary>
         Task<Response> UpdateAvatarAsync(Guid userId, string? avatarFileName);
+
+        /// <summary>
+        /// Toàn bộ người dùng đang hoạt động, đã merge org/chức danh từ SSO — dùng cho tìm kiếm phía client
+        /// (vd. hộp "Thêm người" khi chia sẻ). Không phân trang, không lọc theo keyword ở server.
+        /// </summary>
+        Task<Response> GetDirectoryAsync();
     }
 }

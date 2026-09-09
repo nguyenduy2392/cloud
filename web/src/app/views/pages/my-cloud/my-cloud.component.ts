@@ -11,7 +11,7 @@ import { Subject, takeUntil, combineLatest } from 'rxjs'
 import { TableLoadingOverlayComponent } from '@components/table-loading-overlay/table-loading-overlay.component'
 import { AppEmptyStateComponent } from '@components/empty-state/empty-state.component'
 import { ConfirmDialogModalComponent } from '@components/confirm-dialog-modal/confirm-dialog-modal.component'
-import { showErrorModal } from '@/app/shared/SharedFunction'
+import { removeDiacritics, showErrorModal } from '@/app/shared/SharedFunction'
 import { FileSizePipe } from '@/app/shared/file-size.pipe'
 import {
   FolderService,
@@ -334,7 +334,7 @@ export class MyCloudComponent implements OnInit, OnDestroy {
   }
 
   private fetchPage(page: number, isFirst: boolean): void {
-    const keyword = this.searchTerm ? this.removeDiacritics(this.searchTerm) : undefined
+    const keyword = this.searchTerm ? removeDiacritics(this.searchTerm) : undefined
     const useSharedApi = this.mode === 'shared' && !this.currentFolderId
     const request$ = useSharedApi
       ? this.resourcePermissionService.getSharedWithMe(page, PAGE_SIZE, keyword)
@@ -669,17 +669,6 @@ export class MyCloudComponent implements OnInit, OnDestroy {
     const parts = fileName.split('.')
     if (parts.length < 2) return ''
     return parts[parts.length - 1].toLowerCase()
-  }
-
-  // --- Search helper ---
-
-  private removeDiacritics(str: string): string {
-    return str
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .toLowerCase()
   }
 
   // --- Error ---

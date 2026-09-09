@@ -1,5 +1,6 @@
 using Application.Auth;
 using Application.Helper;
+using Application.SsoServices;
 using Application.UserServices.Dtos;
 using Core;
 using Core.Common;
@@ -16,17 +17,20 @@ namespace Application.UserServices
         private readonly ICryptorFactory _cryptorFactory;
         private readonly ILogger<UserService> _logger;
         private readonly IAppContextAccessor _accessor;
+        private readonly ISsoDirectoryClient _ssoDirectory;
 
         public UserService(
             IRepository repository,
             ICryptorFactory cryptorFactory,
             ILogger<UserService> logger,
-            IAppContextAccessor accessor)
+            IAppContextAccessor accessor,
+            ISsoDirectoryClient ssoDirectory)
         {
             _repository = repository;
             _cryptorFactory = cryptorFactory;
             _logger = logger;
             _accessor = accessor;
+            _ssoDirectory = ssoDirectory;
         }
 
         public async Task<Response> GetAllAsync(int page = 1, int pageSize = 20, string? keyword = null)
@@ -334,6 +338,52 @@ namespace Application.UserServices
                 .Select(x => new UserModel(x)).ToListAsync();
 
             return Response.Success(users);
+        }
+
+        /// <summary>
+        /// Toàn bộ người dùng đang hoạt động, đã merge org/chức danh từ SSO — dùng cho tìm kiếm phía client.
+        /// </summary>
+        public async Task<Response> GetDirectoryAsync()
+        {
+            var users = await _repository.GetQueryable<AppUser>()
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+
+            var tenantName = _accessor.GetDatabaseName();
+            var members = string.IsNullOrWhiteSpace(tenantName)
+                ? new List<SsoResolvedOrgMember>()
+                : await _ssoDirectory.GetResolvedMembersAsync(tenantName);
+
+            var membersByUser = members
+                .Where(m => m.SsoUserId != Guid.Empty)
+                .GroupBy(m => m.SsoUserId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var result = users.Select(u =>
+            {
+                var item = new UserDirectoryItemDto
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Avatar = u.Avatar,
+                };
+
+                if (u.SsoId is Guid ssoId && membersByUser.TryGetValue(ssoId, out var userMemberships))
+                {
+                    item.OrgTitles = userMemberships.Select(m => m.OrgTitle).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct().ToList();
+                    item.OrgShortNames = userMemberships.Select(m => m.OrgShortName).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList()!;
+                    item.OrgRoleNames = userMemberships.Select(m => m.OrgRoleName).Where(r => !string.IsNullOrWhiteSpace(r)).Distinct().ToList()!;
+                }
+
+                return item;
+            }).ToList();
+
+            return Response.Success(result);
         }
 
     }

@@ -19,7 +19,9 @@ public class HmacAuthMiddleware
     {
         "/api/system/database/initialize",
         "/api/system/migration/run",
-        "/api/system/backfill-keywords"
+        "/api/system/backfill-keywords",
+        "/api/system/sync-user",
+        "/api/system/delete-user"
     };
 
     // Scenario B: cloud API endpoints proxied from HRM BE (on-behalf-of)
