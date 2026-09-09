@@ -5,6 +5,19 @@ export function interpolateString(str: string, params: any): string {
     return str.replace(/{{(\w+)}}/g, (match, p1) => params[p1] || '');
 }
 
+/**
+ * Xoá dấu tiếng Việt + lowercase — dùng để build search key so khớp không phân biệt dấu
+ * (vd. "Ăn" và "an" cùng khớp). Dùng chung cho mọi ô tìm kiếm client-side trong app.
+ */
+export function removeDiacritics(str: string): string {
+    return str
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase()
+}
+
 export function sumwidthConfig(widthConfig: any[]): string {
     let sum = 0;
     widthConfig.forEach(element => {

@@ -206,7 +206,8 @@ namespace Application.CloudServices
 
                 if (existing != null)
                 {
-                    existing.Password = request.PasswordHash;
+                    // KHÔNG ghi đè mật khẩu của user đã tồn tại — người này có thể đã dùng Cloud từ trước
+                    // với mật khẩu riêng (tự đặt trực tiếp trên Cloud). Chỉ set password lúc tạo mới bên dưới.
                     if (!string.IsNullOrEmpty(request.Name)) existing.Name = request.Name;
                     if (!string.IsNullOrEmpty(request.Email)) existing.Email = request.Email;
                     if (!string.IsNullOrEmpty(request.Phone)) existing.Phone = request.Phone;

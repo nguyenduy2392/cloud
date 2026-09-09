@@ -224,5 +224,15 @@ namespace Api.Controllers
             return Ok(await _service.GetAllUsersAsync());
         }
 
+        /// <summary>
+        /// Toàn bộ người dùng đang hoạt động, đã merge org/chức danh từ SSO — dùng cho tìm kiếm phía
+        /// client (vd. hộp "Thêm người" khi chia sẻ file/thư mục). Không phân trang, không lọc keyword.
+        /// </summary>
+        [HttpGet("directory")]
+        public async Task<IActionResult> GetDirectory()
+        {
+            return Ok(await _service.GetDirectoryAsync());
+        }
+
     }
 }

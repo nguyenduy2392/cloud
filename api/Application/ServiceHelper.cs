@@ -1,6 +1,7 @@
 using Application.Auth;
 using Application.CloudServices;
 using Application.Helper;
+using Application.SsoServices;
 using Application.UserServices;
 using Core;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,7 @@ namespace Application
             builder.Services.AddScoped<IUserStorageService, UserStorageService>();
             builder.Services.AddScoped<IDatabaseService, DatabaseService>();
             builder.Services.AddScoped<ITrashService, TrashService>();
+            builder.Services.AddScoped<ISsoDirectoryClient, SsoDirectoryClient>();
         }
     }
 }
