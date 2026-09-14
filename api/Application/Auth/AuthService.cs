@@ -10,6 +10,7 @@ using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -140,14 +141,31 @@ namespace Application.Auth
             if (string.IsNullOrEmpty(accessToken))
                 return Response.Fail("SSO không trả về token.");
 
+            if (string.IsNullOrWhiteSpace(_ssoSettings.JwtSecret))
+            {
+                _logger.LogError("SsoSettings.JwtSecret chưa được cấu hình — không thể verify token SSO.");
+                return Response.Fail("Cấu hình SSO chưa đầy đủ.");
+            }
+
             var jwtHandler = new JwtSecurityTokenHandler();
             JwtSecurityToken jwtToken;
             try
             {
-                jwtToken = jwtHandler.ReadJwtToken(accessToken);
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_ssoSettings.JwtSecret)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromSeconds(30)
+                };
+                jwtHandler.ValidateToken(accessToken, validationParameters, out var validatedToken);
+                jwtToken = (JwtSecurityToken)validatedToken;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Token SSO không hợp lệ (chữ ký sai hoặc đã hết hạn).");
                 return Response.Fail("Token SSO không hợp lệ.");
             }
 
